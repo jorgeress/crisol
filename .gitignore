@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+reports/*.html
+reports/*.json
+bench/*.json
+# NUNCA subir muestras reales de malware al repo
+corpus/malware/*
+corpus/goodware/*
+!corpus/**/.gitkeep

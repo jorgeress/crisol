@@ -1,0 +1,6 @@
+yara-python>=4.5
+pefile>=2024.8.26
+oletools>=0.60
+capstone>=5.0
+rich>=13.0
+jinja2>=3.1
