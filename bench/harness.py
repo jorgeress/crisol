@@ -25,7 +25,7 @@ from yardstick.scanner import RuleSet  # noqa: E402
 
 def _iter_samples(root: Path):
     for p in sorted(root.rglob("*")):
-        if p.is_file():
+        if p.is_file() and p.stat().st_size > 0 and not p.name.startswith("."):
             yield p
 
 

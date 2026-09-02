@@ -17,4 +17,4 @@ jobs:
           mkdir -p corpus/goodware
           cp /usr/bin/ls /usr/bin/cat /usr/lib/x86_64-linux-gnu/libc.so.6 corpus/goodware/ 2>/dev/null || true
           python bench/harness.py --rules rules --goodware corpus/goodware \
-            --malware corpus/malware --max-fp-rate 0.5
+            --malware corpus/malware --max-fp-rate 0.05
