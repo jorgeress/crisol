@@ -82,7 +82,18 @@ yardstick scan muestra.exe --html reports/muestra.html
   Cualquier match aquí es un falso positivo.
 - **Malware**: se descarga de [MalwareBazaar](https://bazaar.abuse.ch) con
   `bench/fetch_malwarebazaar.py` (ZIP con contraseña `infected`). **Nunca se
-  ejecutan** y **nunca se suben al repo** (ver `.gitignore`).
+  ejecutan** y **nunca se suben al repo**.
+
+> **Cómo se manejan las muestras sin pegarse un tiro en el pie:**
+> guardadas `0400` con el sha256 verificado, análisis aislado en bubblewrap
+> (sin red, sin `$HOME`, repo de solo lectura) y un hook `pre-commit` que
+> impide subirlas. El modelo de amenaza completo, con lo que se hace y lo que
+> deliberadamente no, está en **[docs/manejo-seguro-muestras.md](docs/manejo-seguro-muestras.md)**.
+
+```bash
+make hooks           # hook anti-fugas (hazlo ANTES de descargar nada)
+make sandbox-bench   # el bench, con el analizador aislado
+```
 
 ```bash
 export MB_API_KEY=...                  # gratis en bazaar.abuse.ch
@@ -104,6 +115,9 @@ tareas de la siguiente ronda de reglas.
 - [x] Ruleset YARA propio con metadatos y módulo `pe`/`math`
 - [x] Harness de FP/detección por regla + gate en CI
 - [x] **Afinado de reglas guiado por métricas** (FP rate 12.18% → 0%, documentado en la tabla de arriba)
+- [x] **Manejo seguro de muestras**: almacenamiento sin bit de ejecución, sandbox
+      de bubblewrap con aislamiento verificado por tests, y hook anti-fugas
+      ([documentado](docs/manejo-seguro-muestras.md))
 - [ ] **Módulo de evasión controlada**: empaquetar/ofuscar muestras benignas para
       mostrar cómo rompen la detección, y endurecer las reglas en consecuencia
       (el ciclo rojo↔azul es el gancho de entrevista)

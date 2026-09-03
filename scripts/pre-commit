@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Última línea de defensa contra subir una muestra al repo público.
+#
+# .gitignore ya excluye corpus/, pero un `git add -f`, un rename o un
+# .gitignore mal editado se lo saltan. Este hook mira lo que HAY EN EL INDEX,
+# no lo que dicen las reglas de ignore, y bloquea dos cosas:
+#   1. cualquier fichero bajo corpus/ que no sea .gitkeep
+#   2. cualquier binario ejecutable (MZ / ELF / OLE) venga de donde venga
+#
+# Instalar:  make hooks        Saltar (a sabiendas):  git commit --no-verify
+set -euo pipefail
+
+fail=0
+while IFS= read -r -d '' file; do
+    case "$file" in
+        corpus/*)
+            [ "$(basename "$file")" = ".gitkeep" ] && continue
+            echo "BLOQUEADO: $file  (el corpus nunca se sube: es malware real)" >&2
+            fail=1
+            continue
+            ;;
+    esac
+
+    magic=$(git show ":$file" 2>/dev/null | head -c 4 | od -An -tx1 | tr -d ' \n') || continue
+    case "$magic" in
+        4d5a*)      tipo="PE/MZ" ;;
+        7f454c46)   tipo="ELF" ;;
+        d0cf11e0)   tipo="OLE (doc Office)" ;;
+        *)          continue ;;
+    esac
+    echo "BLOQUEADO: $file  (binario $tipo en el index)" >&2
+    fail=1
+done < <(git diff --cached --name-only --diff-filter=ACM -z)
+
+if [ "$fail" -ne 0 ]; then
+    echo "" >&2
+    echo "commit abortado por scripts/pre-commit. Si de verdad es un fichero" >&2
+    echo "legítimo, usa: git commit --no-verify" >&2
+    exit 1
+fi

@@ -1,4 +1,4 @@
-.PHONY: install rules scan corpus bench test clean
+.PHONY: install hooks rules scan corpus bench sandbox-bench test clean
 VENV=.venv
 PY=$(VENV)/bin/python
 
@@ -6,6 +6,11 @@ install:
 	python3 -m venv $(VENV)
 	$(PY) -m pip install -q --upgrade pip
 	$(PY) -m pip install -q -r requirements.txt
+
+# instala el hook que impide subir muestras al repo
+hooks:
+	install -m 755 scripts/pre-commit .git/hooks/pre-commit
+	@echo "[ok] hook pre-commit instalado"
 
 rules:
 	PYTHONPATH=src $(PY) -m yardstick.cli rules
@@ -23,6 +28,11 @@ corpus:
 
 bench:
 	$(PY) bench/harness.py --rules rules --goodware corpus/goodware --malware corpus/malware
+
+# el mismo bench, pero con el analizador aislado (sin red, sin $$HOME, repo ro)
+sandbox-bench:
+	scripts/sandbox.sh $(PY) bench/harness.py --rules rules \
+		--goodware corpus/goodware --malware corpus/malware
 
 test:
 	PYTHONPATH=src $(PY) -m pytest -q
