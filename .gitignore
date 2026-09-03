@@ -8,3 +8,4 @@ bench/*.json
 corpus/malware/*
 corpus/goodware/*
 !corpus/**/.gitkeep
+NOTES.local.md
