@@ -146,6 +146,10 @@ tareas de la siguiente ronda de reglas.
       falsable, en orden de rendimiento esperado: cluster de crypter por forma de
       IAT, overlay desproporcionado, y .NET sin empaquetar
       ([detalle y criterio de aceptación](docs/hallazgos-deteccion.md#cómo-seguir))
+- [ ] **Endurecer el gate de CI con muestras sintéticas versionadas** — el corpus
+      no puede viajar al repo, así que hoy el CI mide FP sobre 3 binarios del
+      runner y no vigila la detección en absoluto; unos PE mínimos construidos a
+      mano sí pueden vivir en git y cerrar ese hueco
 - [ ] **Módulo de evasión controlada**: empaquetar/ofuscar muestras benignas para
       mostrar cómo rompen la detección, y endurecer las reglas en consecuencia
       (el ciclo rojo↔azul es el gancho de entrevista)
