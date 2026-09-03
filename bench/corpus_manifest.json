@@ -1,0 +1,234 @@
+{
+  "0b00260fcd78004dc04227c0885007572b9c592bfd81758977c60101e4c93d5e": {
+    "family": "RemusStealer",
+    "file_name": "Installer.exe",
+    "file_type": "exe",
+    "first_seen": "2026-09-03 13:03:22",
+    "size": 4359032,
+    "tags": [
+      "downloader",
+      "exe",
+      "kryptik",
+      "remus",
+      "RemusStealer",
+      "signed",
+      "stealer"
+    ]
+  },
+  "0f08da5bc3d2c32bd0367d586279d4c7cfc7d35d7ac97cd2ead4b7f4327a8a3a": {
+    "family": "unknown",
+    "file_name": "0f08da5bc3d2c32bd0367d586279d4c7cfc7d35d7ac97cd2ead4b7f4327a8a3a.bin",
+    "file_type": "exe",
+    "first_seen": "2026-09-03 19:36:21",
+    "size": 6287272,
+    "tags": [
+      "exe",
+      "signed",
+      "Vidar"
+    ]
+  },
+  "117e2c3d3b40a2b2cbb2001fa0c1109e51cdec777672d5b325e7edecac442fdd": {
+    "family": "Vidar",
+    "file_name": "117e2c3d3b40a2b2cbb2001fa0c1109e51cdec777672d5b325e7edecac442fdd.bin",
+    "file_type": "exe",
+    "first_seen": "2026-09-03 18:25:10",
+    "size": 6590848,
+    "tags": [
+      "exe",
+      "signed",
+      "Vidar"
+    ]
+  },
+  "1465f0a6ed279e87983f39f9b81e989eb0e92898e21a364ab7fc17a84c808079": {
+    "family": "unknown",
+    "file_name": "1465f0a6ed279e87983f39f9b81e989eb0e92898e21a364ab7fc17a84c808079.bin",
+    "file_type": "exe",
+    "first_seen": "2026-09-03 19:36:29",
+    "size": 98129840,
+    "tags": [
+      "exe",
+      "Vidar"
+    ]
+  },
+  "25b5c7f85cae8d847cf73df5086b1c05b5e200460a7c2d2cc04d89273208f297": {
+    "family": "MassLogger",
+    "file_name": "Bank slip.exe",
+    "file_type": "exe",
+    "first_seen": "2026-09-03 15:33:57",
+    "size": 902144,
+    "tags": [
+      "exe",
+      "MassLogger"
+    ]
+  },
+  "2faf35c81460f594d5471186c8a9be65c004c92c5f3968a67e8e88c11a35d347": {
+    "family": "ValleyRAT",
+    "file_name": "1582E41E322D062A5DF941B89184047F.dll",
+    "file_type": "dll",
+    "first_seen": "2026-09-03 20:10:19",
+    "size": 4544000,
+    "tags": [
+      "dll",
+      "RAT",
+      "ValleyRAT"
+    ]
+  },
+  "32431111b40d7b556a58822361a83566f2fd7dd8270dc58b9f7698cac7ff0f21": {
+    "family": "ConnectWise",
+    "file_name": "32431111b40d7b556a58822361a83566f2fd7dd8270dc58b9f7698cac7ff0f21.exe",
+    "file_type": "exe",
+    "first_seen": "2026-09-03 14:34:31",
+    "size": 5641984,
+    "tags": [
+      "ConnectWise",
+      "exe",
+      "signed",
+      "whack.sh"
+    ]
+  },
+  "517a6bc726a83b3e44aa25569bdf2317a0eca7e9d5879a8218258d3d38ba09f0": {
+    "family": "Vidar",
+    "file_name": "517a6bc726a83b3e44aa25569bdf2317a0eca7e9d5879a8218258d3d38ba09f0.bin",
+    "file_type": "exe",
+    "first_seen": "2026-09-03 13:54:49",
+    "size": 93563320,
+    "tags": [
+      "exe",
+      "Vidar"
+    ]
+  },
+  "52e889aa77ee3e84835f700f19ea091d48b7e0682c13cba6941129cdf9de27ba": {
+    "family": "ValleyRAT",
+    "file_name": "CD4F959C7AAC421945DD04A12535941C.exe",
+    "file_type": "exe",
+    "first_seen": "2026-09-03 20:10:13",
+    "size": 152576,
+    "tags": [
+      "exe",
+      "RAT",
+      "ValleyRAT"
+    ]
+  },
+  "5479dcd030b2c9fd2d990dbab36ceda46570890afa19da42a8f0c6e57b1b39be": {
+    "family": "CoinMiner",
+    "file_name": "5479dcd030b2c9fd2d990dbab36ceda46570890afa19da42a8f0c6e57b1b39be.exe",
+    "file_type": "exe",
+    "first_seen": "2026-09-03 14:02:33",
+    "size": 5262336,
+    "tags": [
+      "CoinMiner",
+      "exe",
+      "whack.sh"
+    ]
+  },
+  "6173641022865c703539ad968331c59f1d5da03add825a79b6d0719bf7c07ed1": {
+    "family": "Vidar",
+    "file_name": "6173641022865c703539ad968331c59f1d5da03add825a79b6d0719bf7c07ed1.bin",
+    "file_type": "exe",
+    "first_seen": "2026-09-03 19:36:32",
+    "size": 10107312,
+    "tags": [
+      "exe",
+      "signed",
+      "Vidar"
+    ]
+  },
+  "64773e9b66825e3e3d653b730f2994eac6635d8166707d076371bb2ff2f7f434": {
+    "family": "ACRStealer",
+    "file_name": "WTSAPI32.DLL",
+    "file_type": "exe",
+    "first_seen": "2026-09-03 12:31:36",
+    "size": 1717248,
+    "tags": [
+      "ACRStealer",
+      "dll",
+      "sync-canyonmere-cc"
+    ]
+  },
+  "64d8f6456140746ac1e5131ab8ada166c62893d53e7daf3d6a829292a7cfefd8": {
+    "family": "njrat",
+    "file_name": "743759338B45950208EA9D6CB6A99AA1.exe",
+    "file_type": "exe",
+    "first_seen": "2026-09-03 20:10:07",
+    "size": 24064,
+    "tags": [
+      "exe",
+      "njrat",
+      "RAT"
+    ]
+  },
+  "72f9149a13822fb42eb1b3a4075fb5f42be7474875814405ee46e402e062985c": {
+    "family": "RemusStealer",
+    "file_name": "Setup.exe",
+    "file_type": "exe",
+    "first_seen": "2026-09-03 12:53:52",
+    "size": 2906480,
+    "tags": [
+      "downloader",
+      "exe",
+      "kryptik",
+      "remus",
+      "RemusStealer",
+      "signed"
+    ]
+  },
+  "7b693ae6ed452fd1a584b321d236ce7305e3281b55497e5963060bd0d5db2ac4": {
+    "family": "ValleyRAT",
+    "file_name": "2026.9.03\u88c1\u5458\u540d\u5355\u53ca\u8865\u507f\u65b9\u6848_SUTE.exe",
+    "file_type": "exe",
+    "first_seen": "2026-09-03 16:33:51",
+    "size": 362592,
+    "tags": [
+      "exe",
+      "SilverFox",
+      "Trojan/SilverFox.bg[qtsc]",
+      "ValleyRAT"
+    ]
+  },
+  "8b972e0131c4f7160a3a60f0d1a57c9bba4db6e205bd9fe2a72755879cef9f5e": {
+    "family": "RemcosRAT",
+    "file_name": "SecuriteInfo.com.Trojan.PackedNET.3632.7263.1970",
+    "file_type": "exe",
+    "first_seen": "2026-09-03 13:39:43",
+    "size": 1485312,
+    "tags": [
+      "exe",
+      "RemcosRAT"
+    ]
+  },
+  "bec2b8cf49b15d40abc3d0f8d36ee3a2282928f36250278b1f27d9236e0d90db": {
+    "family": "Formbook",
+    "file_name": "Ref 2026093-2694.exe",
+    "file_type": "exe",
+    "first_seen": "2026-09-03 19:36:31",
+    "size": 1082368,
+    "tags": [
+      "exe",
+      "Formbook"
+    ]
+  },
+  "e3fc2840cec07dff9c35f528bbe7b3efbe1d60d9a8de9d1467a47cfa7016c278": {
+    "family": "unknown",
+    "file_name": "e3fc2840cec07dff9c35f528bbe7b3efbe1d60d9a8de9d1467a47cfa7016c278.exe",
+    "file_type": "exe",
+    "first_seen": "2026-09-03 20:07:35",
+    "size": 5248512,
+    "tags": [
+      "exe",
+      "whack.sh"
+    ]
+  },
+  "ffb3eacf4164d66a8d5e591c043f3f86d599e8d39384417d6fdf78796ae18a84": {
+    "family": "RustyStealer",
+    "file_name": "file",
+    "file_type": "exe",
+    "first_seen": "2026-09-03 18:38:25",
+    "size": 6626816,
+    "tags": [
+      "54e64e",
+      "dropped-by-Amadey",
+      "exe",
+      "RustyStealer"
+    ]
+  }
+}

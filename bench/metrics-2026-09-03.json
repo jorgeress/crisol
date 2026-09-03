@@ -1,0 +1,138 @@
+{
+  "rules_compiled": 9,
+  "goodware_total": 52,
+  "goodware_flagged": 0,
+  "false_positive_rate": 0.0,
+  "malware_total": 19,
+  "malware_detected": 7,
+  "detection_rate": 0.3684,
+  "per_rule": {
+    "anti_debug_stacked": {
+      "true_positives": 1,
+      "false_positives": 0,
+      "fp_rate_vs_goodware": 0.0
+    },
+    "high_entropy_section": {
+      "true_positives": 5,
+      "false_positives": 0,
+      "fp_rate_vs_goodware": 0.0
+    },
+    "packer_signature_strings": {
+      "true_positives": 1,
+      "false_positives": 0,
+      "fp_rate_vs_goodware": 0.0
+    }
+  },
+  "per_family": {
+    "ValleyRAT": {
+      "total": 3,
+      "detected": 0,
+      "detection_rate": 0.0
+    },
+    "Vidar": {
+      "total": 3,
+      "detected": 1,
+      "detection_rate": 0.3333
+    },
+    "unknown": {
+      "total": 3,
+      "detected": 1,
+      "detection_rate": 0.3333
+    },
+    "RemusStealer": {
+      "total": 2,
+      "detected": 0,
+      "detection_rate": 0.0
+    },
+    "ACRStealer": {
+      "total": 1,
+      "detected": 1,
+      "detection_rate": 1.0
+    },
+    "CoinMiner": {
+      "total": 1,
+      "detected": 1,
+      "detection_rate": 1.0
+    },
+    "ConnectWise": {
+      "total": 1,
+      "detected": 0,
+      "detection_rate": 0.0
+    },
+    "Formbook": {
+      "total": 1,
+      "detected": 1,
+      "detection_rate": 1.0
+    },
+    "MassLogger": {
+      "total": 1,
+      "detected": 1,
+      "detection_rate": 1.0
+    },
+    "RemcosRAT": {
+      "total": 1,
+      "detected": 1,
+      "detection_rate": 1.0
+    },
+    "RustyStealer": {
+      "total": 1,
+      "detected": 0,
+      "detection_rate": 0.0
+    },
+    "njrat": {
+      "total": 1,
+      "detected": 0,
+      "detection_rate": 0.0
+    }
+  },
+  "false_negatives": [
+    {
+      "sha256": "0b00260fcd78004dc04227c0885007572b9c592bfd81758977c60101e4c93d5e",
+      "family": "RemusStealer"
+    },
+    {
+      "sha256": "0f08da5bc3d2c32bd0367d586279d4c7cfc7d35d7ac97cd2ead4b7f4327a8a3a",
+      "family": "unknown"
+    },
+    {
+      "sha256": "117e2c3d3b40a2b2cbb2001fa0c1109e51cdec777672d5b325e7edecac442fdd",
+      "family": "Vidar"
+    },
+    {
+      "sha256": "1465f0a6ed279e87983f39f9b81e989eb0e92898e21a364ab7fc17a84c808079",
+      "family": "unknown"
+    },
+    {
+      "sha256": "2faf35c81460f594d5471186c8a9be65c004c92c5f3968a67e8e88c11a35d347",
+      "family": "ValleyRAT"
+    },
+    {
+      "sha256": "32431111b40d7b556a58822361a83566f2fd7dd8270dc58b9f7698cac7ff0f21",
+      "family": "ConnectWise"
+    },
+    {
+      "sha256": "52e889aa77ee3e84835f700f19ea091d48b7e0682c13cba6941129cdf9de27ba",
+      "family": "ValleyRAT"
+    },
+    {
+      "sha256": "6173641022865c703539ad968331c59f1d5da03add825a79b6d0719bf7c07ed1",
+      "family": "Vidar"
+    },
+    {
+      "sha256": "64d8f6456140746ac1e5131ab8ada166c62893d53e7daf3d6a829292a7cfefd8",
+      "family": "njrat"
+    },
+    {
+      "sha256": "72f9149a13822fb42eb1b3a4075fb5f42be7474875814405ee46e402e062985c",
+      "family": "RemusStealer"
+    },
+    {
+      "sha256": "7b693ae6ed452fd1a584b321d236ce7305e3281b55497e5963060bd0d5db2ac4",
+      "family": "ValleyRAT"
+    },
+    {
+      "sha256": "ffb3eacf4164d66a8d5e591c043f3f86d599e8d39384417d6fdf78796ae18a84",
+      "family": "RustyStealer"
+    }
+  ]
+}

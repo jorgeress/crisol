@@ -4,6 +4,9 @@ __pycache__/
 reports/*.html
 reports/*.json
 bench/*.json
+# excepciones: no son muestras, son metadatos y métricas -> reproducibilidad
+!bench/corpus_manifest.json
+!bench/metrics-*.json
 # NUNCA subir muestras reales de malware al repo
 corpus/malware/*
 corpus/goodware/*
