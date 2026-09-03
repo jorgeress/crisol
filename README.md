@@ -85,9 +85,18 @@ yardstick scan muestra.exe --html reports/muestra.html
   ejecutan** y **nunca se suben al repo** (ver `.gitignore`).
 
 ```bash
-export MB_API_KEY=...      # gratis en bazaar.abuse.ch
-python bench/fetch_malwarebazaar.py --tag exe --limit 25
+export MB_API_KEY=...                  # gratis en bazaar.abuse.ch
+# o bien:  echo '<clave>' > .mb_api_key   (gitignored)
+
+make corpus                            # TAG=exe LIMIT=30 MAXFAM=3 por defecto
+python bench/fetch_malwarebazaar.py --tag exe --limit 30 --max-per-family 3 --dry-run
 ```
+
+El fetcher tope por familia (`--max-per-family`) para que el corpus no sea
+monotemático, salta lo ya descargado y escribe `bench/corpus_manifest.json`
+(sha256 → familia, tipo, tags). Con ese manifiesto el harness desglosa la
+**detección por familia** y lista los **falsos negativos**, que son la lista de
+tareas de la siguiente ronda de reglas.
 
 ## Roadmap
 

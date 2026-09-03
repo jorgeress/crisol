@@ -9,3 +9,4 @@ corpus/malware/*
 corpus/goodware/*
 !corpus/**/.gitkeep
 NOTES.local.md
+.mb_api_key

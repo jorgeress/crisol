@@ -4,3 +4,6 @@ oletools>=0.60
 capstone>=5.0
 rich>=13.0
 jinja2>=3.1
+# solo para bench/fetch_malwarebazaar.py (construir el corpus de malware)
+requests>=2.32
+pyzipper>=0.3.6
