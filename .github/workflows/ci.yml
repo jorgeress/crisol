@@ -29,3 +29,10 @@ jobs:
         run: |
           python bench/harness.py --rules rules --goodware corpus/goodware \
             --malware corpus/malware --max-fp-rate 0.0
+      # El escaneo recursivo multiplica el alcance de TODAS las reglas, así que
+      # necesita su propio gate: el goodware incluye un auto-extraíble con PE
+      # legítimos dentro, justo para que este paso pueda fallar.
+      - name: Benchmark de falsos positivos (escaneo recursivo)
+        run: |
+          python bench/harness.py --rules rules --goodware corpus/goodware \
+            --malware corpus/malware --recursive --max-fp-rate 0.0
