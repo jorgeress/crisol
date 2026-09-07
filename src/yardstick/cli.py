@@ -20,7 +20,15 @@ DEFAULT_RULES = Path(__file__).resolve().parents[2] / "rules"
 def _cmd_scan(args) -> int:
     rs = RuleSet(args.rules).compile()
     feats = extract(args.sample)
-    matches = rs.scan_bytes(Path(args.sample).read_bytes(), timeout=args.timeout)
+    data = Path(args.sample).read_bytes()
+    nested: list = []
+    if args.recursive:
+        matches, nested = rs.scan_recursive(data, timeout=args.timeout)
+    else:
+        matches = rs.scan_bytes(data, timeout=args.timeout)
+    # El veredicto se calcula solo con lo que dispara sobre el fichero: que un
+    # contenedor lleve algo dentro es una pista para el analista, no una
+    # condena automática. Los payloads se listan aparte.
     report = build_report(feats, matches)
 
     if args.json:
@@ -64,6 +72,18 @@ def _cmd_scan(args) -> int:
     else:
         console.print("  [dim]sin coincidencias YARA[/]")
 
+    if nested:
+        tbl = Table(title="Payloads embebidos que sí disparan", show_lines=False)
+        tbl.add_column("origen", style="magenta")
+        tbl.add_column("reglas")
+        for origin, hits in nested:
+            tbl.add_row(origin, ", ".join(sorted({m.rule for m in hits})))
+        console.print(tbl)
+        console.print("  [dim]no cuentan para el veredicto: el contenedor no es "
+                      "su contenido[/]")
+    elif args.recursive:
+        console.print("  [dim]sin coincidencias en los payloads embebidos[/]")
+
     for ioc_type, vals in feats.iocs.items():
         if vals:
             console.print(f"  IOC {ioc_type}: {', '.join(vals[:5])}"
@@ -104,6 +124,9 @@ def main(argv=None) -> int:
     ps.add_argument("--json", action="store_true", help="salida JSON")
     ps.add_argument("--html", metavar="OUT.html", help="escribe informe HTML")
     ps.add_argument("--timeout", type=int, default=30)
+    ps.add_argument("--recursive", action="store_true",
+                    help="escanea también los PE embebidos y los miembros de ZIP "
+                         "que lleve dentro (no alteran el veredicto)")
     ps.set_defaults(func=_cmd_scan)
 
     pf = sub.add_parser("features", help="solo extracción de features (JSON)")

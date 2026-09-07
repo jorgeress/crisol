@@ -111,4 +111,30 @@ PYZ
 
 sfx control-sfx-zip-amd64.exe 20
 
+# Segundo control, para el escaneo recursivo (--recursive): un auto-extraíble
+# que lleva dentro EJECUTABLES legítimos, sin comprimir, o sea tallables. El
+# anterior solo llevaba datos, así que no decía nada sobre lo que pasa cuando
+# el motor abre un contenedor y escanea lo de dentro. Un instalador de verdad
+# tiene exactamente esta forma: stub + ejecutables reales detrás.
+bundle() {
+    local name=$1
+    python3 - "$WORK/bundle.zip" "$OUT" <<'PYZ'
+import sys, zipfile
+from pathlib import Path
+out, good = sys.argv[1], Path(sys.argv[2])
+# ZIP_STORED a propósito: comprimidos no se pueden tallar, y lo que se quiere
+# medir aquí es justo el caso en que sí se pueden.
+with zipfile.ZipFile(out, "w", zipfile.ZIP_STORED) as z:
+    for exe in sorted(good.glob("go-*.exe")):
+        z.write(exe, f"bin/{exe.name}")
+PYZ
+    rm -f "$OUT/$name"
+    cat "$OUT/go-hello-amd64.exe" "$WORK/bundle.zip" > "$OUT/$name"
+    chmod 0444 "$OUT/$name"
+    rm -f "$WORK/bundle.zip"
+    echo "  $name (lleva dentro los PE legítimos, sin comprimir)"
+}
+
+bundle control-bundle-pe-amd64.exe
+
 echo "[ok] $(go version)"

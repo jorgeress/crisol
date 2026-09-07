@@ -69,3 +69,22 @@ class RuleSet:
 
     def scan_file(self, path: str | Path, timeout: int = 30) -> list[Match]:
         return self.scan_bytes(Path(path).read_bytes(), timeout=timeout)
+
+    def scan_recursive(self, data: bytes, timeout: int = 30
+                       ) -> tuple[list[Match], list[tuple[str, list[Match]]]]:
+        """Escanea la muestra y, aparte, cada payload que lleve dentro.
+
+        Devuelve (matches del fichero, [(origen, matches) por payload]). Van
+        separados a propósito: "este fichero dispara una regla" y "este
+        fichero *contiene* algo que la dispara" son afirmaciones distintas y
+        mezclarlas infla la detección sin decirlo.
+        """
+        from .carve import extract_payloads
+
+        top = self.scan_bytes(data, timeout=timeout)
+        nested: list[tuple[str, list[Match]]] = []
+        for payload in extract_payloads(data):
+            hits = self.scan_bytes(payload.data, timeout=timeout)
+            if hits:
+                nested.append((payload.origin, hits))
+        return top, nested
