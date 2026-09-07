@@ -1,4 +1,4 @@
-.PHONY: install hooks rules scan corpus bench sandbox-bench test clean
+.PHONY: install hooks rules scan corpus goodware bench sandbox-bench test clean
 VENV=.venv
 PY=$(VENV)/bin/python
 
@@ -25,6 +25,12 @@ LIMIT?=30
 MAXFAM?=3
 corpus:
 	$(PY) bench/fetch_malwarebazaar.py --tag $(TAG) --limit $(LIMIT) --max-per-family $(MAXFAM)
+
+# goodware de Windows (PE de Go + control con forma de auto-extraíble):
+# sin él el 0% de FP se mide sobre un corpus que no contiene la clase de
+# software que las reglas van a marcar. Ver docs/ronda-2-reglas.md
+goodware:
+	bench/make_goodware_go.sh
 
 bench:
 	$(PY) bench/harness.py --rules rules --goodware corpus/goodware --malware corpus/malware
