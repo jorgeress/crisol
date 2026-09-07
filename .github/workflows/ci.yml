@@ -7,14 +7,25 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
+      - uses: actions/setup-go@v5
+        with: { go-version: "1.23" }
       - run: pip install -r requirements.txt pytest
       - name: Compilar reglas YARA
         run: PYTHONPATH=src python -m yardstick.cli rules
+      # Los tests incluyen los dos sentidos sobre PE mínimos generados en
+      # memoria (tests/minipe.py): la detección también queda vigilada aquí,
+      # sin que ninguna muestra real tenga que viajar al repo.
       - name: Tests
         run: PYTHONPATH=src pytest -q
-      - name: Benchmark de falsos positivos (goodware del runner)
+      - name: Corpus de goodware del runner
         run: |
           mkdir -p corpus/goodware
           cp /usr/bin/ls /usr/bin/cat /usr/lib/x86_64-linux-gnu/libc.so.6 corpus/goodware/ 2>/dev/null || true
+          # PE legítimos de Go + un auto-extraíble con forma de instalador: es
+          # el goodware de Windows que el runner no tiene y sin el cual el
+          # 0% de FP no significa nada (ver docs/hallazgos-deteccion.md).
+          bench/make_goodware_go.sh
+      - name: Benchmark de falsos positivos
+        run: |
           python bench/harness.py --rules rules --goodware corpus/goodware \
-            --malware corpus/malware --max-fp-rate 0.05
+            --malware corpus/malware --max-fp-rate 0.0
