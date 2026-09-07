@@ -1,13 +1,13 @@
 # Manejo seguro de muestras
 
 Este documento explica **cómo se manejan las muestras reales de malware** en
-yardstick y, sobre todo, *por qué* cada control está donde está. Es la parte
+crisol y, sobre todo, *por qué* cada control está donde está. Es la parte
 que un laboratorio de verdad da por supuesta y que casi ningún proyecto de
 portfolio documenta.
 
 ## El punto de partida: análisis estático
 
-yardstick **nunca ejecuta la muestra**. Extrae features (cabeceras PE/ELF,
+crisol **nunca ejecuta la muestra**. Extrae features (cabeceras PE/ELF,
 IAT, entropía, strings) y corre reglas YARA sobre los bytes. Eso cambia el
 modelo de amenaza por completo respecto a un laboratorio dinámico: no hace
 falta una VM desechable con red aislada, porque no hay proceso malicioso
@@ -19,14 +19,14 @@ Lo que sí queda es un riesgo más sutil, y es el que se ataca aquí.
 
 | # | Riesgo | Probabilidad | Impacto | Control |
 |---|--------|--------------|---------|---------|
-| 1 | **Ejecución accidental** — un `chmod +x`, un glob en un script, un doble clic | Alta | Compromiso del host | Muestras `0400` sin extensión; el nombre es el sha256; nunca se toca el bit de ejecución |
-| 2 | **Fuga al repo público** — `git add -f`, un rename, un `.gitignore` mal editado | Media | Distribuir malware; incumplir el ToS de abuse.ch | `.gitignore` + hook `pre-commit` que inspecciona el *index*, no las reglas de ignore |
-| 3 | **Exploit del parser** — un fichero malformado a propósito revienta `pefile`, `oletools` o `libyara` | Baja | Ejecución en el proceso analizador | `scripts/sandbox.sh`: bubblewrap sin red, sin `$HOME`, repo de solo lectura, `NoNewPrivs` |
-| 4 | **Propagación lateral** — la muestra acaba en un backup, un sync a la nube o la escanea un Windows de la red | Media | Alertas de EDR ajenas; borrado del corpus | Corpus fuera de rutas sincronizadas; directorio `0700`; excluido de backups |
-| 5 | **Corpus mal etiquetado** — se guarda algo distinto de lo que el manifiesto afirma | Media | **Métricas mentirosas** | sha256 recalculado en la descarga; si no cuadra, se descarta |
+| 1 | **Ejecución accidental**: un `chmod +x`, un glob en un script, un doble clic | Alta | Compromiso del host | Muestras `0400` sin extensión; el nombre es el sha256; nunca se toca el bit de ejecución |
+| 2 | **Fuga al repo público**: `git add -f`, un rename, un `.gitignore` mal editado | Media | Distribuir malware; incumplir el ToS de abuse.ch | `.gitignore` + hook `pre-commit` que inspecciona el *index*, no las reglas de ignore |
+| 3 | **Exploit del parser**: un fichero malformado a propósito revienta `pefile`, `oletools` o `libyara` | Baja | Ejecución en el proceso analizador | `scripts/sandbox.sh`: bubblewrap sin red, sin `$HOME`, repo de solo lectura, `NoNewPrivs` |
+| 4 | **Propagación lateral**: la muestra acaba en un backup, un sync a la nube o la escanea un Windows de la red | Media | Alertas de EDR ajenas; borrado del corpus | Corpus fuera de rutas sincronizadas; directorio `0700`; excluido de backups |
+| 5 | **Corpus mal etiquetado**: se guarda algo distinto de lo que el manifiesto afirma | Media | **Métricas mentirosas** | sha256 recalculado en la descarga; si no cuadra, se descarta |
 
 El riesgo 5 no es de seguridad sino de integridad, pero es el más caro para
-este proyecto en concreto: todo el valor de yardstick está en que sus números
+este proyecto en concreto: todo el valor de crisol está en que sus números
 sean creíbles.
 
 ## Controles implementados
@@ -34,7 +34,7 @@ sean creíbles.
 ### 1. Almacenamiento sin filo cortante
 `bench/fetch_malwarebazaar.py` guarda cada muestra:
 
-- con el **sha256 como nombre y sin extensión** — no hay `.exe` que invite a un
+- con el **sha256 como nombre y sin extensión**: no hay `.exe` que invite a un
   doble clic, ni extensión que dispare un handler del escritorio;
 - con permisos **`0400`** (solo lectura, ni ejecución ni escritura), en un
   directorio `0700`;
@@ -44,7 +44,7 @@ sean creíbles.
 ### 2. Aislamiento del analizador
 ```bash
 scripts/sandbox.sh make bench          # o: make sandbox-bench
-scripts/sandbox.sh .venv/bin/python -m yardstick.cli scan corpus/malware/<sha>
+scripts/sandbox.sh .venv/bin/python -m crisol.cli scan corpus/malware/<sha>
 ```
 
 `scripts/sandbox.sh` envuelve el comando en [bubblewrap](https://github.com/containers/bubblewrap)
@@ -82,7 +82,7 @@ sudo mount --bind -o noexec,nosuid,nodev corpus/malware corpus/malware
 
 Y, para que sobreviva a un reinicio, la línea equivalente en `/etc/fstab`.
 Recomendado también: excluir `corpus/` de cualquier backup o carpeta
-sincronizada (Dropbox, Drive, Syncthing) — un backup automático es la vía más
+sincronizada (Dropbox, Drive, Syncthing), porque un backup automático es la vía más
 silenciosa de propagar una muestra a otra máquina.
 
 ## Lo que deliberadamente NO se hace
@@ -102,7 +102,7 @@ silenciosa de propagar una muestra a otra máquina.
 ## Checklist operativo
 
 Antes de descargar:
-- [ ] `make hooks` — el hook anti-fugas está instalado
+- [ ] `make hooks`: el hook anti-fugas está instalado
 - [ ] `corpus/` no está dentro de una carpeta sincronizada ni de un backup
 
 Al analizar:
@@ -110,4 +110,4 @@ Al analizar:
 - [ ] nunca `chmod +x` sobre nada de `corpus/malware/`
 
 Al publicar:
-- [ ] solo hashes, familias y métricas — jamás bytes de una muestra
+- [ ] solo hashes, familias y métricas, jamás bytes de una muestra

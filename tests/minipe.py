@@ -4,7 +4,7 @@ Las reglas que usan el módulo `pe` de YARA (overlay, imports, secciones) no se
 pueden probar con un buffer falso: hace falta una cabecera que el parser
 acepte. Estos PE se generan en memoria, son inertes (no hay código, el punto
 de entrada no apunta a nada ejecutable) y viajan en el repo como código, no
-como binario — que es la única forma de versionar "muestras" sin subir malware.
+como binario, que es la única forma de versionar "muestras" sin subir malware.
 """
 from __future__ import annotations
 

@@ -1,5 +1,5 @@
 [project]
-name = "yardstick"
+name = "crisol"
 version = "0.1.0"
 description = "Motor de triaje estático de malware y banco de pruebas de reglas YARA"
 requires-python = ">=3.11"
@@ -10,7 +10,7 @@ dependencies = [
 ]
 
 [project.scripts]
-yardstick = "yardstick.cli:main"
+crisol = "crisol.cli:main"
 
 [build-system]
 requires = ["setuptools>=68"]

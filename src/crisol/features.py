@@ -56,7 +56,7 @@ def shannon_entropy(data: bytes) -> float:
 
 
 def extract_strings(data: bytes, min_len: int = 5) -> tuple[list[str], list[str]]:
-    """Devuelve (ascii, wide/utf-16le) — imitación ligera de `strings`."""
+    """Devuelve (ascii, wide/utf-16le): imitación ligera de `strings`."""
     ascii_re = re.compile(rb"[\x20-\x7e]{%d,}" % min_len)
     wide_re = re.compile((rb"(?:[\x20-\x7e]\x00){%d,}" % min_len))
     ascii_s = [m.decode("ascii", "ignore") for m in ascii_re.findall(data)]

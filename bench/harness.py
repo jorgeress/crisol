@@ -1,4 +1,4 @@
-"""Banco de pruebas de reglas YARA — el corazón del "detection engineering".
+"""Banco de pruebas de reglas YARA: el corazón del "detection engineering".
 
 Mide, sobre dos corpus etiquetados:
   - corpus/goodware/  → cualquier match = FALSO POSITIVO
@@ -29,7 +29,7 @@ from collections import defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from yardstick.scanner import RuleSet  # noqa: E402
+from crisol.scanner import RuleSet  # noqa: E402
 
 DEFAULT_MANIFEST = Path(__file__).resolve().parent / "corpus_manifest.json"
 

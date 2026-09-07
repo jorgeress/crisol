@@ -55,7 +55,7 @@ def compute_score(feats: Features, matches: list[Match]) -> dict[str, Any]:
 def build_report(feats: Features, matches: list[Match]) -> dict[str, Any]:
     return {
         "generated": datetime.now(timezone.utc).isoformat(),
-        "tool": "yardstick",
+        "tool": "crisol",
         "triage": compute_score(feats, matches),
         "yara_matches": [
             {"rule": m.rule, "namespace": m.namespace, "tags": m.tags,
@@ -71,7 +71,7 @@ def to_json(report: dict[str, Any], indent: int = 2) -> str:
 
 
 _HTML = """<!doctype html><meta charset=utf-8>
-<title>yardstick — {sha}</title>
+<title>crisol · {sha}</title>
 <style>
 body{{font:14px/1.5 system-ui,sans-serif;margin:2rem auto;max-width:900px;color:#1a1a1a}}
 h1{{font-size:1.4rem}} code{{background:#f0f0f0;padding:1px 4px;border-radius:3px}}
@@ -82,7 +82,7 @@ th,td{{border:1px solid #ddd;padding:6px 10px;text-align:left;font-size:13px}}
 th{{background:#fafafa}} .meter{{height:22px;background:#eee;border-radius:11px;overflow:hidden}}
 .meter>div{{height:100%;background:linear-gradient(90deg,#27ae60,#e67e22,#c0392b)}}
 </style>
-<h1>yardstick · triaje estático</h1>
+<h1>crisol · triaje estático</h1>
 <p><code>{path}</code><br>sha256 <code>{sha}</code> · {size} bytes · tipo <b>{ftype}</b></p>
 <p>Veredicto: <span class="badge {verdict}">{verdict}</span> · score <b>{score}/100</b></p>
 <div class="meter"><div style="width:{score}%"></div></div>

@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from yardstick.features import shannon_entropy, extract_strings, _detect_filetype
+from crisol.features import shannon_entropy, extract_strings, _detect_filetype
 
 
 def test_entropy_bounds():
@@ -27,7 +27,7 @@ def test_extract_strings():
 
 def test_extract_on_self():
     # extrae features de un binario real del sistema sin petar
-    from yardstick.features import extract
+    from crisol.features import extract
     f = extract("/usr/bin/python3" if Path("/usr/bin/python3").exists() else sys.executable)
     assert f.sha256 and f.size > 0
     assert f.filetype in ("elf", "pe")

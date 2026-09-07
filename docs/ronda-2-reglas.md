@@ -41,7 +41,7 @@ Las dos peores siguen siendo **ConnectWise (1/11)** y **ValleyRAT (1/13)**, y
 ninguna de las dos cae por empaquetado, que es lo único que este motor sabe
 hacer bien.
 
-## Hipótesis 1 — REFUTADA: no era un crypter, era el runtime de Go
+## Hipótesis 1, REFUTADA: no era un crypter, era el runtime de Go
 
 La ronda 1 encontró cuatro muestras con `imphash f0ea7b78...` y exactamente 40
 imports, repartidas entre Vidar, RemusStealer y `unknown`, y concluyó que era
@@ -71,8 +71,8 @@ func main() { fmt.Println("hola") }
 Compilado con `GOOS=windows go build`, ese programa tiene **47 imports, solo
 kernel32**, y una IAT indistinguible de la de los stealers del corpus.
 
-Así que se escribió la regla que pedía la hipótesis —la *forma* de la IAT, no
-el hash literal— y se midió contra un goodware que ahora incluye binarios de Go
+Así que se escribió la regla que pedía la hipótesis (la *forma* de la IAT, no
+el hash literal) y se midió contra un goodware que ahora incluye binarios de Go
 para Windows generados con [`bench/make_goodware_go.sh`](../bench/make_goodware_go.sh):
 
 | Versión de la regla | TP | FP | Veredicto |
@@ -86,12 +86,12 @@ escrito en Go, y eso incluye docker, kubectl, terraform y hugo.
 **Y aquí está lo importante**: esta regla habría dado 0% de falsos positivos
 contra el corpus de la ronda 1, porque aquel goodware eran 52 binarios de Linux
 y de Wine, ni uno compilado con Go. Es *exactamente* el mismo error del
-hallazgo 2 de la ronda anterior —afinar contra un corpus que no contiene la
-clase que te va a doler— pero cazado antes de publicar la regla en vez de
+hallazgo 2 de la ronda anterior (afinar contra un corpus que no contiene la
+clase que te va a doler), pero cazado antes de publicar la regla en vez de
 después. El arreglo no fue tocar la regla: fue **arreglar el corpus**, y por eso
 `make_goodware_go.sh` es el entregable real de esta hipótesis.
 
-## Hipótesis 2 — PUBLICADA: overlay que se come el fichero
+## Hipótesis 2, PUBLICADA: overlay que se come el fichero
 
 El overlay son los bytes que van detrás de la última sección. Medido sobre los
 dos corpus:
@@ -119,7 +119,7 @@ otra regla.
 
 ### La renuncia deliberada
 
-Un instalador legítimo —NSIS, Inno Setup, un 7z auto-extraíble— es un PE
+Un instalador legítimo (NSIS, Inno Setup, un 7z auto-extraíble) es un PE
 pequeño con un archivo comprimido gigante pegado detrás. Estructuralmente es
 **idéntico** al relleno de evasión. Por eso la regla no dispara si el overlay
 empieza por la firma de un contenedor conocido (ZIP, CAB, 7z, RAR, XZ, gzip,
@@ -141,15 +141,15 @@ enciende y el gate de CI falla.
 *propietario* (sin firma reconocible) sí sería un falso positivo. No hay ninguno
 en el corpus, así que hoy es una hipótesis sin medir, no un hecho.
 
-## Hipótesis 3 — BLOQUEADA: no hay goodware .NET con el que falsarla
+## Hipótesis 3, BLOQUEADA: no hay goodware .NET con el que falsarla
 
 Trece muestras del corpus son .NET (10 njrat, MassLogger, Formbook, RemcosRAT),
 doce de ellas con un único import: `mscoree.dll!_CorExeMain`. Cinco njrat siguen
 sin detectarse.
 
 La hipótesis proponía combinar ese pivote .NET con strings de RAT. Al buscarlas,
-lo que aparece en las trece muestras es WinForms genérico —`STAThreadAttribute`,
-`ResumeLayout`, `ResourceManager`, el manifiesto de `requestedPrivileges`— y no
+lo que aparece en las trece muestras es WinForms genérico (`STAThreadAttribute`,
+`ResumeLayout`, `ResourceManager`, el manifiesto de `requestedPrivileges`) y no
 un solo indicador específico de familia: no son njRAT desnudo, son *droppers*
 .NET con el payload dentro de los recursos. Los indicadores de comportamiento
 que sí discriminarían (`InvokeMember`, `GetManifestResourceStream`,
@@ -182,7 +182,7 @@ demostrar que está mal es el trabajo.
 
 ## Cómo seguir
 
-1. **Goodware .NET** (`dotnet build`, análogo a `make_goodware_go.sh`) — sin eso
+1. **Goodware .NET** (`dotnet build`, análogo a `make_goodware_go.sh`). Sin eso
    la hipótesis 3 no se puede ni intentar.
 2. **Goodware de instaladores reales** (NSIS, Inno, 7z SFX legítimos) para
    medir de verdad el punto ciego de `overlay_bulk_inflation`, hoy cubierto solo

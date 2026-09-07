@@ -13,11 +13,11 @@ hooks:
 	@echo "[ok] hook pre-commit instalado"
 
 rules:
-	PYTHONPATH=src $(PY) -m yardstick.cli rules
+	PYTHONPATH=src $(PY) -m crisol.cli rules
 
 # make scan SAMPLE=/ruta/muestra
 scan:
-	PYTHONPATH=src $(PY) -m yardstick.cli scan $(SAMPLE)
+	PYTHONPATH=src $(PY) -m crisol.cli scan $(SAMPLE)
 
 # make corpus TAG=exe LIMIT=30 MAXFAM=3   (necesita MB_API_KEY o .mb_api_key)
 TAG?=exe

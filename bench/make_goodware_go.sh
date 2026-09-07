@@ -6,11 +6,11 @@
 # falsos positivos, porque la tabla de imports de un binario de Go es
 # constante (solo kernel32.dll, ~40-48 funciones) y es exactamente la misma
 # en un stealer y en `fmt.Println("hola")`. Cualquier regla que mire esa forma
-# marcaría todo el ecosistema Go —docker, kubectl, terraform, hugo— y contra
+# marcaría todo el ecosistema Go (docker, kubectl, terraform, hugo) y contra
 # un corpus sin Go daría 0% de FP, mintiendo.
 #
 # No se versionan los binarios (pesan MB y el repo no guarda corpus): se
-# reconstruyen aquí, que además es más honesto — cualquiera reproduce el
+# reconstruyen aquí, que además es más honesto: cualquiera reproduce el
 # mismo experimento con su propio toolchain.
 #
 #   bench/make_goodware_go.sh
@@ -88,7 +88,7 @@ build go-httpcli-stripped.exe amd64 ./cli "-s -w"
 # --- control con forma de instalador auto-extraíble --------------------------
 # La regla de overlay que mide el "inflado de tamaño" tiene un enemigo natural:
 # un instalador legítimo (NSIS, Inno, 7z SFX) es un PE pequeño con un archivo
-# comprimido gigante pegado detrás — estructuralmente idéntico al relleno de
+# comprimido gigante pegado detrás, estructuralmente idéntico al relleno de
 # evasión. El corpus de goodware no tenía ni uno, así que aquí se construye:
 # binario legítimo + ZIP real detrás, que es literalmente lo que es un SFX.
 # Si la regla dispara aquí, es un falso positivo sobre software legítimo.

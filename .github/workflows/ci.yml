@@ -11,7 +11,7 @@ jobs:
         with: { go-version: "1.23" }
       - run: pip install -r requirements.txt pytest
       - name: Compilar reglas YARA
-        run: PYTHONPATH=src python -m yardstick.cli rules
+        run: PYTHONPATH=src python -m crisol.cli rules
       # Los tests incluyen los dos sentidos sobre PE mínimos generados en
       # memoria (tests/minipe.py): la detección también queda vigilada aquí,
       # sin que ninguna muestra real tenga que viajar al repo.

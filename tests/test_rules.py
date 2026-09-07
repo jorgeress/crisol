@@ -11,7 +11,7 @@ import os
 
 import pytest
 from minipe import build_pe
-from yardstick.scanner import RuleSet
+from crisol.scanner import RuleSet
 
 RULES = RuleSet(str(Path(__file__).resolve().parents[1] / "rules")).compile()
 

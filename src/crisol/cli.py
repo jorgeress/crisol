@@ -1,4 +1,4 @@
-"""CLI de yardstick: scan, features, rules."""
+"""CLI de crisol: scan, features, rules."""
 from __future__ import annotations
 
 import argparse
@@ -113,9 +113,9 @@ def _cmd_rules(args) -> int:
 
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(
-        prog="yardstick",
+        prog="crisol",
         description="Motor de triaje estático de malware + banco de reglas YARA")
-    p.add_argument("--version", action="version", version=f"yardstick {__version__}")
+    p.add_argument("--version", action="version", version=f"crisol {__version__}")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     ps = sub.add_parser("scan", help="triaje completo de una muestra")

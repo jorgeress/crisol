@@ -9,7 +9,7 @@ suma, sino por qué no puedo firmarla.**
 
 ## Qué se ha construido
 
-`src/yardstick/carve.py` extrae payloads de una muestra y
+`src/crisol/carve.py` extrae payloads de una muestra y
 `RuleSet.scan_recursive()` los escanea:
 
 - **PE embebidos sin comprimir**, tallados leyendo la tabla de secciones a mano
@@ -20,7 +20,7 @@ suma, sino por qué no puedo firmarla.**
 Con topes en todo (64 payloads, 64 MB cada uno) porque cada offset que entra
 ahí lo eligió el fichero analizado, no yo.
 
-Disponible en `bench/harness.py --recursive` y en `yardstick scan --recursive`.
+Disponible en `bench/harness.py --recursive` y en `crisol scan --recursive`.
 
 ## Los dos números van separados
 
@@ -45,8 +45,8 @@ embebida en el instalador.
 ConnectWise ScreenConnect es **software legítimo de acceso remoto**, abusado
 por actores que lo despliegan configurado contra su propio servidor. Las
 muestras del corpus llevan dentro las URLs de code signing de DigiCert: son
-instaladores firmados de verdad. Lo malicioso es la **configuración** —en una de
-ellas, el IOC `192.162.199.231`— no la estructura del binario.
+instaladores firmados de verdad. Lo malicioso es la **configuración** (en una de
+ellas, el IOC `192.162.199.231`), no la estructura del binario.
 
 O sea: un instalador legítimo de ScreenConnect dispararía exactamente igual.
 
@@ -56,7 +56,7 @@ En una assembly .NET los recursos gestionados embebidos viven **dentro de
 `.text`**, que está marcada como ejecutable. `high_entropy_section` exige
 precisamente una sección ejecutable con entropía ≥7.4. Conclusión: **cualquier
 assembly .NET con recursos comprimidos grandes dispara esa regla**, y eso
-describe a media industria — apps WPF, instaladores, ClickOnce.
+describe a media industria: apps WPF, instaladores, ClickOnce.
 
 Sobre el fichero de arriba eso casi nunca se ve, porque una assembly .NET
 suelta no suele traer 3 MB de recursos. Al escanear recursivamente, en cambio,
@@ -89,7 +89,7 @@ no dispara sobre ninguno. Ese 0 sí significa algo.
 ## Un límite que también es una defensa
 
 El tallado solo encuentra payloads **sin comprimir**. Un instalador que
-deflatea su contenido es invisible aquí — eso recorta lo que se detecta, pero
+deflatea su contenido es invisible aquí, y eso recorta lo que se detecta, pero
 recorta exactamente igual lo que se puede marcar por error: lo que sale del
 tallador son ejecutables tal cual, no blobs descomprimidos que se parezcan a
 cualquier cosa.
@@ -105,7 +105,7 @@ goodware que se enciende **solo** por lo que lleva dentro no incrementaba esa
 tasa: el umbral pasaba sin haber comprobado nada. Arreglado con
 `false_positive_rate_recursive`, que es la que mira el gate cuando `--recursive`
 está activo, y con un test de regresión (`tests/test_harness_gate.py`) que
-construye el caso —contenedor limpio, payload sucio— y comprueba que el gate
+construye el caso (contenedor limpio, payload sucio) y comprueba que el gate
 falla. Un gate que no puede fallar no es un gate.
 
 ## Cómo seguir

@@ -1,7 +1,7 @@
 """Tests del tallado de payloads embebidos.
 
 Todo con PE mínimos generados en memoria (tests/minipe.py): lo que se prueba
-es el extractor, y para eso no hace falta —ni conviene— una muestra real.
+es el extractor, y para eso no hace falta (ni conviene) una muestra real.
 """
 import io
 import os
@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from minipe import build_pe
-from yardstick.carve import MAX_PAYLOADS, MIN_PAYLOAD_SIZE, carve_pes, extract_payloads, unzip
+from crisol.carve import MAX_PAYLOADS, MIN_PAYLOAD_SIZE, carve_pes, extract_payloads, unzip
 
 
 def test_carves_embedded_pe_intact():

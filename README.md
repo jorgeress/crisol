@@ -1,11 +1,15 @@
-# yardstick — motor de triaje estático de malware + banco de reglas YARA
+# crisol: motor de triaje estático de malware + banco de reglas YARA
 
 > Analiza binarios (PE / ELF / documentos ofimáticos) **sin ejecutarlos**, los
-> puntúa con heurísticas explicables y coincidencias YARA propias, y —lo más
-> importante— **mide la calidad de esas reglas** contra corpus de goodware y
+> puntúa con heurísticas explicables y coincidencias YARA propias y, sobre
+> todo, **mide la calidad de esas reglas** contra corpus de goodware y
 > malware. Detection engineering, no una caja negra.
 
 ![python](https://img.shields.io/badge/python-3.11+-blue) ![license](https://img.shields.io/badge/license-MIT-green) ![ci](https://img.shields.io/badge/ci-github_actions-lightgrey)
+
+*El crisol es donde se funde el metal para ensayarlo: no fabrica nada, solo
+revela lo que no aguanta la prueba. Aquí lo que se ensaya son reglas YARA, y
+más de una no ha salido entera.*
 
 ## Por qué este proyecto
 
@@ -14,11 +18,11 @@ analista es saber **cuánto vale una regla**: ¿cuántos falsos positivos genera
 contra software legítimo? ¿qué tasa de detección real tiene? Este proyecto
 convierte esa pregunta en un número reproducible.
 
-Ejemplo real del baseline de este repo — un binario **legítimo y firmado de
+Ejemplo real del baseline de este repo: un binario **legítimo y firmado de
 Microsoft** clasificado como malicioso por reglas demasiado laxas:
 
 ```
-$ yardstick scan winhttp-proxy-shim.exe
+$ crisol scan winhttp-proxy-shim.exe
   veredicto malicious-likely  (score 75/100)      <-- FALSO POSITIVO
   YARA: dynamic_api_resolution_and_alloc, anti_debug_checks
 ```
@@ -49,18 +53,18 @@ anterior por sí solo no dice nada. Contra **69 muestras reales de MalwareBazaar
 Dos autopsias, y las dos van de lo mismo: **el banco vale lo que valga el corpus
 de goodware.**
 
-- **[Ronda 1](docs/hallazgos-deteccion.md)** (19 muestras) —
+- **[Ronda 1](docs/hallazgos-deteccion.md)** (19 muestras).
   `dynamic_api_resolution_small_iat`, la regla que mejor bajó los FP en la tabla
   de arriba, tiene **0 verdaderos positivos**. El umbral `IAT < 30` se ajustó
   mirando solo goodware; el malware real importa entre 39 y 658 funciones.
   Sobreajuste de manual, medido y documentado.
-- **[Escaneo recursivo](docs/escaneo-recursivo.md)** — abrir los contenedores sube
+- **[Escaneo recursivo](docs/escaneo-recursivo.md)**: abrir los contenedores sube
   la detección a 37.68%, y ese número **no está en la tabla de arriba a
   propósito**: las 6 detecciones nuevas salen de `high_entropy_section`
   disparando sobre assemblies .NET embebidas, y un instalador legítimo de
   ScreenConnect dispararía igual. Sin goodware .NET no se puede falsar, así que
   no se firma.
-- **[Ronda 2](docs/ronda-2-reglas.md)** (69 muestras) — de las tres hipótesis que
+- **[Ronda 2](docs/ronda-2-reglas.md)** (69 muestras). De las tres hipótesis que
   dejó la ronda 1, una se publica (+5 detecciones sin tocar el 0% de FP), otra se
   **refuta** y otra se declara **bloqueada**. El "cluster de crypter" que iba a
   ser la pieza de mayor rendimiento resultó ser **el runtime de Go**: la regla que
@@ -77,25 +81,70 @@ muestras no se redistribuyen) y el de goodware de Windows con
 
 ## Arquitectura
 
-```
-muestra ──► features.py ──► señales estáticas (entropía, imports, secciones,
-              (sin ejecutar)   macros VBA, IOCs, overlay, imphash…)
-        │
-        └──► scanner.py ────► reglas YARA propias (rules/)  ──┐
-                                                              ├─► report.py
-              scoring heurístico explicable  ─────────────────┘   (JSON / HTML / CLI)
+### Cómo se analiza una muestra
 
-bench/harness.py ──► corre las reglas sobre corpus etiquetados
-                     ► FP rate (goodware) · detección (malware) · por-regla
+Nada se ejecuta: todo es lectura de bytes, y encima dentro de un sandbox.
+
+```mermaid
+flowchart LR
+    S["muestra<br/>PE · ELF · OLE"] --> SB["scripts/sandbox.sh<br/>bubblewrap: sin red,<br/>sin HOME, repo solo lectura"]
+
+    SB --> F["features.py<br/>entropía · imports · secciones<br/>overlay · imphash · macros · IOCs"]
+    SB --> Y["scanner.py<br/>reglas YARA de rules/"]
+    SB --> C["carve.py<br/>PE embebidos + ZIP"]
+
+    C -.->|"cada payload,<br/>escaneado aparte"| Y
+
+    F --> R["report.py<br/>scoring explicable:<br/>cada punto tiene su razón"]
+    Y --> R
+    R --> V["veredicto + JSON/HTML<br/>exit 0 · 1 · 2"]
+    C -.-> P["payloads que disparan,<br/>listados aparte:<br/>NO cambian el veredicto"]
+
+    classDef nota fill:#fff4e5,stroke:#d08b1f,color:#5c3d00;
+    class P nota
 ```
+
+### Cómo se mide una regla
+
+Esto es lo que distingue al proyecto. Una regla no vale por lo que caza, sino
+por lo que caza **sin marcar software legítimo**, y eso es un número.
+
+```mermaid
+flowchart TD
+    RU["rules/*.yar"] --> H["bench/harness.py"]
+    G["corpus/goodware<br/>binarios del sistema + PE de Go<br/>+ controles auto-extraíbles"] --> H
+    M["corpus/malware<br/>69 muestras · 12 familias<br/>reconstruible desde el manifiesto"] --> H
+
+    H --> FP["FP rate<br/>cualquier match aquí<br/>es un falso positivo"]
+    H --> DE["detección<br/>global y por familia"]
+    H --> FN["falsos negativos<br/>con familia y tamaño"]
+
+    FP --> GATE{"¿FP = 0%?"}
+    GATE -->|"no"| KILL["la regla se descarta,<br/>por buena que sea la detección"]
+    GATE -->|"sí"| SHIP["se publica<br/>+ gate de CI"]
+
+    FN --> HIP["hipótesis falsable<br/>con ganancia esperada"]
+    HIP --> RU
+    KILL --> HIP
+
+    classDef malo fill:#fde8e8,stroke:#c0392b,color:#7b1a13;
+    classDef bueno fill:#e6f4ea,stroke:#1e7e34,color:#14532d;
+    class KILL malo
+    class SHIP bueno
+```
+
+El bucle de la derecha es el trabajo real: los falsos negativos son la lista de
+tareas de la siguiente ronda de reglas, y el criterio de aceptación no se
+negocia. Las dos rondas hechas hasta ahora están documentadas en
+[`docs/`](docs/), incluida la que terminó **tirando** la regla que más prometía.
 
 | Módulo | Qué hace |
 |--------|----------|
-| `src/yardstick/features.py` | Extracción estática: hashes, entropía global/por-sección, imports (con lista curada de APIs abusadas), imphash, overlay, secciones RWX, macros VBA (oletools), IOCs (URLs/IPs/dominios/registro). |
-| `src/yardstick/scanner.py`  | Compila todo `rules/**/*.yar` en un ruleset y ejecuta el match, opcionalmente también sobre los payloads embebidos. |
-| `src/yardstick/carve.py`    | Talla PE embebidos sin comprimir y abre ZIP, para escanear lo que hay *dentro* de un contenedor. Con topes: cada offset lo elige el fichero analizado. |
-| `src/yardstick/report.py`   | Scoring ponderado **explicable** (cada punto tiene su razón) + salida JSON y HTML. |
-| `src/yardstick/cli.py`      | `scan`, `features`, `rules`. Exit code 0/1/2 = limpio/sospechoso/malicioso (útil en pipelines). |
+| `src/crisol/features.py` | Extracción estática: hashes, entropía global/por-sección, imports (con lista curada de APIs abusadas), imphash, overlay, secciones RWX, macros VBA (oletools), IOCs (URLs/IPs/dominios/registro). |
+| `src/crisol/scanner.py`  | Compila todo `rules/**/*.yar` en un ruleset y ejecuta el match, opcionalmente también sobre los payloads embebidos. |
+| `src/crisol/carve.py`    | Talla PE embebidos sin comprimir y abre ZIP, para escanear lo que hay *dentro* de un contenedor. Con topes: cada offset lo elige el fichero analizado. |
+| `src/crisol/report.py`   | Scoring ponderado **explicable** (cada punto tiene su razón) + salida JSON y HTML. |
+| `src/crisol/cli.py`      | `scan`, `features`, `rules`. Exit code 0/1/2 = limpio/sospechoso/malicioso (útil en pipelines). |
 | `bench/harness.py`          | El banco de pruebas: métricas de FP/detección por regla, con umbral para CI. |
 | `bench/make_goodware_go.sh` | Genera goodware de Windows (PE de Go + un auto-extraíble de control) que el corpus no tenía y sin el cual el 0% de FP no significa nada. |
 | `tests/minipe.py`           | Constructor de PE mínimos y válidos en memoria: permite probar las reglas del módulo `pe` en CI sin que ninguna muestra viaje al repo. |
@@ -111,9 +160,9 @@ make bench                            # métricas de FP/detección
 make test
 
 # salidas alternativas
-yardstick scan muestra.exe --recursive       # escanea también lo que lleva dentro
-yardstick scan muestra.exe --json > report.json
-yardstick scan muestra.exe --html reports/muestra.html
+crisol scan muestra.exe --recursive       # escanea también lo que lleva dentro
+crisol scan muestra.exe --json > report.json
+crisol scan muestra.exe --html reports/muestra.html
 ```
 
 ## El corpus (importante)
@@ -164,15 +213,15 @@ tareas de la siguiente ronda de reglas.
 - [x] **Manejo seguro de muestras**: almacenamiento sin bit de ejecución, sandbox
       de bubblewrap con aislamiento verificado por tests, y hook anti-fugas
       ([documentado](docs/manejo-seguro-muestras.md))
-- [x] **Subir la detección sin romper el 0% de FP** — las tres hipótesis de la
+- [x] **Subir la detección sin romper el 0% de FP**: las tres hipótesis de la
       ronda 1, pasadas por el banco: overlay desproporcionado **publicada** (+5),
       cluster de crypter **refutada** (era Go), .NET **bloqueada** por falta de
       goodware con el que falsarla ([ronda 2](docs/ronda-2-reglas.md))
-- [x] **Endurecer el gate de CI** — `tests/minipe.py` genera PE mínimos válidos en
+- [x] **Endurecer el gate de CI**: `tests/minipe.py` genera PE mínimos válidos en
       memoria, así que la CI vigila también la **detección** sin subir muestras; y
       `make_goodware_go.sh` le da al runner goodware de Windows real, con el gate
       de FP ya en `--max-fp-rate 0.0`
-- [ ] **Goodware .NET** — bloquea dos cosas: la hipótesis 3 y validar las 6
+- [ ] **Goodware .NET**: bloquea dos cosas, la hipótesis 3 y validar las 6
       detecciones del escaneo recursivo. Es lo siguiente que más vale
 - [x] **Abrir contenedores**: tallado de PE embebidos y de ZIP, con la detección
       recursiva contada aparte de la directa
@@ -197,4 +246,4 @@ estudiar los límites de la detección, no para producir malware funcional.
 
 ## Licencia
 
-MIT — Jorge García, 2026.
+MIT. Jorge García, 2026.

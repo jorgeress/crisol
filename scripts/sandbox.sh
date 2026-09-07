@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Ejecuta un comando de yardstick dentro de un sandbox de bubblewrap.
+# Ejecuta un comando de crisol dentro de un sandbox de bubblewrap.
 #
 # Por qué: el análisis es ESTÁTICO (nunca se ejecuta la muestra), así que el
 # riesgo no es la muestra corriendo: es que un fichero deliberadamente
@@ -11,7 +11,7 @@
 # No necesita root: usa user namespaces sin privilegios.
 #
 #   scripts/sandbox.sh make bench
-#   scripts/sandbox.sh .venv/bin/python -m yardstick.cli scan corpus/malware/<sha>
+#   scripts/sandbox.sh .venv/bin/python -m crisol.cli scan corpus/malware/<sha>
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

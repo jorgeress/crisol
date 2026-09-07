@@ -2,9 +2,9 @@
 
 _3 de septiembre de 2026 · 19 muestras · 12 familias_
 
-Hasta aquí yardstick solo medía **falsos positivos** (0% sobre 52 binarios
+Hasta aquí crisol solo medía **falsos positivos** (0% sobre 52 binarios
 legítimos). Eso es media historia: unas reglas que no disparan nunca también
-tienen 0% de FP. Este documento es la otra mitad — qué detectan de verdad, qué
+tienen 0% de FP. Este documento es la otra mitad: qué detectan de verdad, qué
 se les escapa y **por qué**.
 
 ## Resultado
@@ -56,7 +56,7 @@ Métricas crudas en [`bench/metrics-2026-09-03.json`](../bench/metrics-2026-09-0
 ### 1. El motor es, hoy, un detector de entropía
 Cinco de las siete detecciones vienen de `high_entropy_section`, una de strings
 de packer y una de anti-debug. **Ninguna de comportamiento.** Todo lo que
-yardstick caza, lo caza porque está empaquetado; contra una muestra sin
+crisol caza, lo caza porque está empaquetado; contra una muestra sin
 empaquetar es ciego.
 
 ### 2. La hipótesis del "IAT diminuta" queda refutada
@@ -91,14 +91,14 @@ Otro cluster, `f34d5f2d4577ed6d9ceec516c1f5a744` con 1 import, es
 `mscoree.dll!_CorExeMain`: la firma de **cualquier ejecutable .NET**
 (MassLogger, Formbook, njrat aquí). Como regla suelta devolvería el FP rate a
 dos dígitos el día que el goodware tenga un binario .NET. Sirve como
-**pivote** — condición de entrada que se combina con otra evidencia — nunca
+**pivote** (condición de entrada que se combina con otra evidencia), nunca
 como detección por sí sola.
 
 ### 5. Inflado de tamaño como evasión
 Dos muestras rondan los 90 MB con ~87 MB de **overlay** (datos tras la última
 sección). Es relleno deliberado: muchos AV y sandboxes saltan ficheros por
-encima de un umbral de tamaño. La estructura es muy característica —overlay
-enorme y de baja entropía— y el goodware casi nunca la tiene, así que promete
+encima de un umbral de tamaño. La estructura es muy característica (overlay
+enorme y de baja entropía) y el goodware casi nunca la tiene, así que promete
 detección con FP bajo.
 
 ### 6. Lo pequeño y sin empaquetar es invisible
@@ -123,13 +123,13 @@ strings y estructura .NET.
 Las tres reglas siguientes, en orden de rendimiento esperado, cada una con su
 hipótesis falsable:
 
-1. **Cluster de crypter por forma de IAT** (hallazgo 3) — *hipótesis*: la
+1. **Cluster de crypter por forma de IAT** (hallazgo 3). *Hipótesis*: la
    combinación de imphash y conteo de imports identifica al crypter con
    independencia de la familia. *Ganancia esperada*: +3 detecciones (→ ~52%).
-2. **Overlay desproporcionado** (hallazgo 5) — *hipótesis*: un overlay que es
+2. **Overlay desproporcionado** (hallazgo 5). *Hipótesis*: un overlay que es
    >80% del fichero y supera decenas de MB es relleno de evasión, no datos
    legítimos. *Ganancia esperada*: +1, y generaliza a campañas futuras.
-3. **Malware .NET sin empaquetar** (hallazgo 6) — *hipótesis*: el pivote .NET
+3. **Malware .NET sin empaquetar** (hallazgo 6). *Hipótesis*: el pivote .NET
    del hallazgo 4 más strings de RAT (`mscoree` + patrones de configuración
    embebida) discrimina sin tocar el goodware .NET.
 
@@ -147,6 +147,6 @@ que cada muestra deje de valer 5 puntos.
 
 > **Continuación (7 sep 2026)**: hecho, y con sorpresa. El corpus está en 69
 > muestras y las tres hipótesis ya pasaron por el banco: la 2 se publica, la 3 se
-> queda bloqueada y **la 1 —la de mayor rendimiento esperado— queda refutada: el
+> queda bloqueada y **la 1, la de mayor rendimiento esperado, queda refutada: el
 > "cluster de crypter" de este documento es el runtime de Go**. Está todo en
 > **[la ronda 2](ronda-2-reglas.md)**.

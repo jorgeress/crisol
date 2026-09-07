@@ -6,7 +6,7 @@ instaladores porque un NSIS malicioso y uno legítimo tienen la misma forma;
 la respuesta a eso no es una regla más laxa, es abrir el contenedor y escanear
 lo de dentro, que es lo que hace este módulo.
 
-Alcance deliberado — esto NO es un desempaquetador:
+Alcance deliberado, porque esto NO es un desempaquetador:
 
   - Talla PE embebidos que estén **sin comprimir**. Un payload deflateado
     dentro de un instalador es invisible aquí, y eso limita tanto lo que se
