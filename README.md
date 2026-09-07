@@ -5,7 +5,9 @@
 > todo, **mide la calidad de esas reglas** contra corpus de goodware y
 > malware. Detection engineering, no una caja negra.
 
-![python](https://img.shields.io/badge/python-3.11+-blue) ![license](https://img.shields.io/badge/license-MIT-green) ![ci](https://img.shields.io/badge/ci-github_actions-lightgrey)
+[![ci](https://github.com/jorgeress/crisol/actions/workflows/ci.yml/badge.svg)](https://github.com/jorgeress/crisol/actions/workflows/ci.yml)
+![python](https://img.shields.io/badge/python-3.11+-blue)
+[![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 *El crisol es donde se funde el metal para ensayarlo: no fabrica nada, solo
 revela lo que no aguanta la prueba. Aquí lo que se ensaya son reglas YARA, y
@@ -239,11 +241,27 @@ tareas de la siguiente ronda de reglas.
 
 ## Ética y alcance
 
-Herramienta **defensiva y educativa** de análisis estático. No ejecuta muestras.
-El corpus de malware se maneja en local, cifrado en su ZIP de origen, y jamás se
-versiona. El módulo de evasión opera sobre binarios benignos de prueba para
-estudiar los límites de la detección, no para producir malware funcional.
+**Este repositorio no contiene ni una sola muestra de malware**, y nunca la ha
+contenido: puede comprobarse recorriendo el historial completo, donde lo único
+que hay bajo `corpus/` son dos ficheros `.gitkeep`. Lo que sí se publica es
+[`bench/corpus_manifest.json`](bench/corpus_manifest.json), con los sha256 y la
+familia de cada muestra. Eso es inteligencia de amenazas de dominio público
+(los mismos hashes están en MalwareBazaar) y es lo que hace reproducibles las
+métricas: cualquiera reconstruye el corpus y contrasta los números, sin que yo
+redistribuya nada.
+
+Herramienta **defensiva y educativa** de análisis estático. No ejecuta muestras:
+todo es lectura de bytes, y encima dentro de un sandbox sin red. El corpus se
+maneja en local con las precauciones documentadas en
+[manejo seguro de muestras](docs/manejo-seguro-muestras.md), y un hook
+`pre-commit` bloquea cualquier intento de subirlo. El módulo de evasión que
+figura en el roadmap operará sobre binarios benignos de prueba, para estudiar
+los límites de la detección, no para producir malware funcional.
+
+La documentación cita algún IOC concreto (una IP de C2, hashes) cuando hace
+falta para sostener un argumento técnico. Es la práctica normal en un informe
+de análisis.
 
 ## Licencia
 
-MIT. Jorge García, 2026.
+MIT, ver [LICENSE](LICENSE). Jorge García, 2026.
