@@ -35,31 +35,39 @@ guió el rediseño de cada regla. Cada cambio está justificado con datos:
 | `vba_powershell_invocation` | **0.6%** | **0%** | Disparaba sobre PEs donde `"powershell"` aparece legítimamente. Ahora excluye binarios PE/ELF nativos. |
 | **Global** | **12.18%** | **0.0%** | 52 muestras de goodware, 0 marcadas. |
 
-### Y el otro lado del banco: detección real (3 sep 2026)
+### Y el otro lado del banco: detección real
 
 Unas reglas que no disparan nunca también tienen 0% de FP, así que el número
-anterior por sí solo no dice nada. Contra **19 muestras reales de
-MalwareBazaar** (12 familias):
+anterior por sí solo no dice nada. Contra **69 muestras reales de MalwareBazaar**
+(12 familias) y 57 de goodware:
 
 | Métrica | Valor |
 |---|---|
-| Falsos positivos (52 goodware) | **0.0%** |
-| Detección (19 muestras reales) | **36.84%** |
+| Falsos positivos (57 goodware) | **0.0%** |
+| Detección (69 muestras reales) | **28.99%** |
 
-Y ahí aparece lo interesante: **`dynamic_api_resolution_small_iat`, la regla que
-mejor bajó los FP en la tabla de arriba, tiene 0 verdaderos positivos.** El
-umbral `IAT < 30` se ajustó mirando solo goodware; el malware real de este
-corpus importa entre 39 y 658 funciones. Es sobreajuste de manual, medido y
-documentado.
+Dos autopsias, y las dos van de lo mismo: **el banco vale lo que valga el corpus
+de goodware.**
 
-La autopsia completa —qué detecta cada regla, qué familias quedan ciegas, un
-cluster de imphash que agrupa 4 muestras, evasión por inflado de tamaño, y las
-limitaciones de un corpus de n=19— está en
-**[docs/hallazgos-deteccion.md](docs/hallazgos-deteccion.md)**.
+- **[Ronda 1](docs/hallazgos-deteccion.md)** (19 muestras) —
+  `dynamic_api_resolution_small_iat`, la regla que mejor bajó los FP en la tabla
+  de arriba, tiene **0 verdaderos positivos**. El umbral `IAT < 30` se ajustó
+  mirando solo goodware; el malware real importa entre 39 y 658 funciones.
+  Sobreajuste de manual, medido y documentado.
+- **[Ronda 2](docs/ronda-2-reglas.md)** (69 muestras) — de las tres hipótesis que
+  dejó la ronda 1, una se publica (+5 detecciones sin tocar el 0% de FP), otra se
+  **refuta** y otra se declara **bloqueada**. El "cluster de crypter" que iba a
+  ser la pieza de mayor rendimiento resultó ser **el runtime de Go**: la regla que
+  lo caza marca `fmt.Println("hola")` compilado para Windows, y marcó **5 de 5**
+  binarios legítimos de Go en cuanto se metieron en el corpus. Habría dado 0% de
+  FP contra el corpus de la ronda 1, que no tenía ni uno.
 
-Métricas crudas versionadas en [`bench/metrics-2026-09-03.json`](bench/metrics-2026-09-03.json);
-el corpus es reconstruible desde [`bench/corpus_manifest.json`](bench/corpus_manifest.json)
-(sha256 y familia; las muestras no se redistribuyen).
+Métricas crudas versionadas en [`bench/metrics-2026-09-07.json`](bench/metrics-2026-09-07.json)
+(y las de la ronda 1 en [`bench/metrics-2026-09-03.json`](bench/metrics-2026-09-03.json));
+el corpus de malware es reconstruible desde
+[`bench/corpus_manifest.json`](bench/corpus_manifest.json) (sha256 y familia; las
+muestras no se redistribuyen) y el de goodware de Windows con
+[`bench/make_goodware_go.sh`](bench/make_goodware_go.sh).
 
 ## Arquitectura
 
@@ -82,6 +90,8 @@ bench/harness.py ──► corre las reglas sobre corpus etiquetados
 | `src/yardstick/report.py`   | Scoring ponderado **explicable** (cada punto tiene su razón) + salida JSON y HTML. |
 | `src/yardstick/cli.py`      | `scan`, `features`, `rules`. Exit code 0/1/2 = limpio/sospechoso/malicioso (útil en pipelines). |
 | `bench/harness.py`          | El banco de pruebas: métricas de FP/detección por regla, con umbral para CI. |
+| `bench/make_goodware_go.sh` | Genera goodware de Windows (PE de Go + un auto-extraíble de control) que el corpus no tenía y sin el cual el 0% de FP no significa nada. |
+| `tests/minipe.py`           | Constructor de PE mínimos y válidos en memoria: permite probar las reglas del módulo `pe` en CI sin que ninguna muestra viaje al repo. |
 | `rules/`                    | Reglas YARA propias, con `author`/`date`/`severity`/`mitre`/`reference`. |
 
 ## Uso
@@ -100,8 +110,11 @@ yardstick scan muestra.exe --html reports/muestra.html
 
 ## El corpus (importante)
 
-- **Goodware**: binarios legítimos del sistema (`/usr/bin`, DLLs de Windows/Wine).
-  Cualquier match aquí es un falso positivo.
+- **Goodware**: binarios legítimos del sistema (`/usr/bin`, DLLs de Windows/Wine)
+  más PE de Windows generados con `make goodware` (programas triviales de Go y un
+  auto-extraíble de control). Cualquier match aquí es un falso positivo.
+  Esa segunda mitad no es un adorno: [una regla entera murió](docs/ronda-2-reglas.md)
+  el día que entró en el corpus.
 - **Malware**: se descarga de [MalwareBazaar](https://bazaar.abuse.ch) con
   `bench/fetch_malwarebazaar.py` (ZIP con contraseña `infected`). **Nunca se
   ejecutan** y **nunca se suben al repo**.
@@ -121,6 +134,7 @@ make sandbox-bench   # el bench, con el analizador aislado
 export MB_API_KEY=...                  # gratis en bazaar.abuse.ch
 # o bien:  echo '<clave>' > .mb_api_key   (gitignored)
 
+make goodware                          # goodware de Windows (necesita el toolchain de Go)
 make corpus                            # TAG=exe LIMIT=30 MAXFAM=3 por defecto
 python bench/fetch_malwarebazaar.py --tag exe --limit 30 --max-per-family 3 --dry-run
 ```
@@ -142,14 +156,18 @@ tareas de la siguiente ronda de reglas.
 - [x] **Manejo seguro de muestras**: almacenamiento sin bit de ejecución, sandbox
       de bubblewrap con aislamiento verificado por tests, y hook anti-fugas
       ([documentado](docs/manejo-seguro-muestras.md))
-- [ ] **Subir la detección sin romper el 0% de FP** — tres reglas con hipótesis
-      falsable, en orden de rendimiento esperado: cluster de crypter por forma de
-      IAT, overlay desproporcionado, y .NET sin empaquetar
-      ([detalle y criterio de aceptación](docs/hallazgos-deteccion.md#cómo-seguir))
-- [ ] **Endurecer el gate de CI con muestras sintéticas versionadas** — el corpus
-      no puede viajar al repo, así que hoy el CI mide FP sobre 3 binarios del
-      runner y no vigila la detección en absoluto; unos PE mínimos construidos a
-      mano sí pueden vivir en git y cerrar ese hueco
+- [x] **Subir la detección sin romper el 0% de FP** — las tres hipótesis de la
+      ronda 1, pasadas por el banco: overlay desproporcionado **publicada** (+5),
+      cluster de crypter **refutada** (era Go), .NET **bloqueada** por falta de
+      goodware con el que falsarla ([ronda 2](docs/ronda-2-reglas.md))
+- [x] **Endurecer el gate de CI** — `tests/minipe.py` genera PE mínimos válidos en
+      memoria, así que la CI vigila también la **detección** sin subir muestras; y
+      `make_goodware_go.sh` le da al runner goodware de Windows real, con el gate
+      de FP ya en `--max-fp-rate 0.0`
+- [ ] **Goodware .NET** — sin él la hipótesis 3 no se puede ni intentar, y
+      cualquier regla .NET de este repo sería una regla sin banco
+- [ ] **Abrir contenedores** (Inno/NSIS/7z) y escanear el payload: ahí están las
+      dos ValleyRAT que `overlay_bulk_inflation` deja pasar a sabiendas
 - [ ] **Módulo de evasión controlada**: empaquetar/ofuscar muestras benignas para
       mostrar cómo rompen la detección, y endurecer las reglas en consecuencia
       (el ciclo rojo↔azul es el gancho de entrevista)

@@ -142,3 +142,11 @@ otra dirección.
 Antes de escribir nada conviene subir el corpus a 50-60 muestras con
 `--signature` sobre las familias ciegas (ValleyRAT, RemusStealer, njrat), para
 que cada muestra deje de valer 5 puntos.
+
+---
+
+> **Continuación (7 sep 2026)**: hecho, y con sorpresa. El corpus está en 69
+> muestras y las tres hipótesis ya pasaron por el banco: la 2 se publica, la 3 se
+> queda bloqueada y **la 1 —la de mayor rendimiento esperado— queda refutada: el
+> "cluster de crypter" de este documento es el runtime de Go**. Está todo en
+> **[la ronda 2](ronda-2-reglas.md)**.
