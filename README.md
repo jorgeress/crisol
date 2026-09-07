@@ -54,6 +54,12 @@ de goodware.**
   de arriba, tiene **0 verdaderos positivos**. El umbral `IAT < 30` se ajustó
   mirando solo goodware; el malware real importa entre 39 y 658 funciones.
   Sobreajuste de manual, medido y documentado.
+- **[Escaneo recursivo](docs/escaneo-recursivo.md)** — abrir los contenedores sube
+  la detección a 37.68%, y ese número **no está en la tabla de arriba a
+  propósito**: las 6 detecciones nuevas salen de `high_entropy_section`
+  disparando sobre assemblies .NET embebidas, y un instalador legítimo de
+  ScreenConnect dispararía igual. Sin goodware .NET no se puede falsar, así que
+  no se firma.
 - **[Ronda 2](docs/ronda-2-reglas.md)** (69 muestras) — de las tres hipótesis que
   dejó la ronda 1, una se publica (+5 detecciones sin tocar el 0% de FP), otra se
   **refuta** y otra se declara **bloqueada**. El "cluster de crypter" que iba a
@@ -86,7 +92,8 @@ bench/harness.py ──► corre las reglas sobre corpus etiquetados
 | Módulo | Qué hace |
 |--------|----------|
 | `src/yardstick/features.py` | Extracción estática: hashes, entropía global/por-sección, imports (con lista curada de APIs abusadas), imphash, overlay, secciones RWX, macros VBA (oletools), IOCs (URLs/IPs/dominios/registro). |
-| `src/yardstick/scanner.py`  | Compila todo `rules/**/*.yar` en un ruleset y ejecuta el match. |
+| `src/yardstick/scanner.py`  | Compila todo `rules/**/*.yar` en un ruleset y ejecuta el match, opcionalmente también sobre los payloads embebidos. |
+| `src/yardstick/carve.py`    | Talla PE embebidos sin comprimir y abre ZIP, para escanear lo que hay *dentro* de un contenedor. Con topes: cada offset lo elige el fichero analizado. |
 | `src/yardstick/report.py`   | Scoring ponderado **explicable** (cada punto tiene su razón) + salida JSON y HTML. |
 | `src/yardstick/cli.py`      | `scan`, `features`, `rules`. Exit code 0/1/2 = limpio/sospechoso/malicioso (útil en pipelines). |
 | `bench/harness.py`          | El banco de pruebas: métricas de FP/detección por regla, con umbral para CI. |
@@ -104,6 +111,7 @@ make bench                            # métricas de FP/detección
 make test
 
 # salidas alternativas
+yardstick scan muestra.exe --recursive       # escanea también lo que lleva dentro
 yardstick scan muestra.exe --json > report.json
 yardstick scan muestra.exe --html reports/muestra.html
 ```
@@ -164,10 +172,14 @@ tareas de la siguiente ronda de reglas.
       memoria, así que la CI vigila también la **detección** sin subir muestras; y
       `make_goodware_go.sh` le da al runner goodware de Windows real, con el gate
       de FP ya en `--max-fp-rate 0.0`
-- [ ] **Goodware .NET** — sin él la hipótesis 3 no se puede ni intentar, y
-      cualquier regla .NET de este repo sería una regla sin banco
-- [ ] **Abrir contenedores** (Inno/NSIS/7z) y escanear el payload: ahí están las
-      dos ValleyRAT que `overlay_bulk_inflation` deja pasar a sabiendas
+- [ ] **Goodware .NET** — bloquea dos cosas: la hipótesis 3 y validar las 6
+      detecciones del escaneo recursivo. Es lo siguiente que más vale
+- [x] **Abrir contenedores**: tallado de PE embebidos y de ZIP, con la detección
+      recursiva contada aparte de la directa
+      ([qué se midió y por qué no me lo creo](docs/escaneo-recursivo.md))
+- [ ] **Descomprimir instaladores** (Inno, NSIS): el tallado solo llega a los
+      payloads sin comprimir, así que las dos ValleyRAT de Inno Setup siguen
+      pasando
 - [ ] **Módulo de evasión controlada**: empaquetar/ofuscar muestras benignas para
       mostrar cómo rompen la detección, y endurecer las reglas en consecuencia
       (el ciclo rojo↔azul es el gancho de entrevista)
