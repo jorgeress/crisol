@@ -1,4 +1,4 @@
-# crisol: motor de triaje estático de malware + banco de reglas YARA
+# Crisol: motor de triaje estático de malware + banco de reglas YARA
 
 > Analiza binarios (PE / ELF / documentos ofimáticos) **sin ejecutarlos**, los
 > puntúa con heurísticas explicables y coincidencias YARA propias y, sobre
