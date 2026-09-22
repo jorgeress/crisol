@@ -9,6 +9,8 @@ jobs:
         with: { python-version: "3.12" }
       - uses: actions/setup-go@v5
         with: { go-version: "1.23" }
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: "10.0.x" }
       - run: pip install -r requirements.txt pytest
       - name: Compilar reglas YARA
         run: PYTHONPATH=src python -m crisol.cli rules
@@ -25,6 +27,10 @@ jobs:
           # el goodware de Windows que el runner no tiene y sin el cual el
           # 0% de FP no significa nada (ver docs/hallazgos-deteccion.md).
           bench/make_goodware_go.sh
+          # Assemblies .NET legítimas, entre ellas una con 3 MB de recursos:
+          # sin ellas high_entropy_section volvería a marcar apps .NET y el
+          # gate no se enteraría (ver docs/ronda-3-dotnet.md).
+          bench/make_goodware_dotnet.sh
       - name: Benchmark de falsos positivos
         run: |
           python bench/harness.py --rules rules --goodware corpus/goodware \

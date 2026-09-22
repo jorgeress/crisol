@@ -26,11 +26,14 @@ MAXFAM?=3
 corpus:
 	$(PY) bench/fetch_malwarebazaar.py --tag $(TAG) --limit $(LIMIT) --max-per-family $(MAXFAM)
 
-# goodware de Windows (PE de Go + control con forma de auto-extraíble):
-# sin él el 0% de FP se mide sobre un corpus que no contiene la clase de
-# software que las reglas van a marcar. Ver docs/ronda-2-reglas.md
+# goodware de Windows: PE de Go, controles con forma de auto-extraíble y
+# assemblies .NET. Sin él el 0% de FP se mide sobre un corpus que no contiene
+# la clase de software que las reglas van a marcar.
+# Ver docs/ronda-2-reglas.md y docs/ronda-3-dotnet.md
+# Necesita los toolchains:  sudo pacman -S go dotnet-sdk
 goodware:
 	bench/make_goodware_go.sh
+	bench/make_goodware_dotnet.sh
 
 bench:
 	$(PY) bench/harness.py --rules rules --goodware corpus/goodware --malware corpus/malware

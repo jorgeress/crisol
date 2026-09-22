@@ -16,12 +16,18 @@ IMAGE_FILE_MACHINE_AMD64 = 0x8664
 SECTION_CNT_CODE = 0x00000020
 SECTION_MEM_EXECUTE = 0x20000000
 SECTION_MEM_READ = 0x40000000
+IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR = 14   # la cabecera CLR: su presencia es lo que hace .NET a un PE
 
 
 def build_pe(section_data: bytes = b"\x90" * 512,
              overlay: bytes = b"",
-             section_name: bytes = b".text") -> bytes:
-    """PE64 de una sección, con el overlay que se le pida detrás."""
+             section_name: bytes = b".text",
+             dotnet: bool = False) -> bytes:
+    """PE64 de una sección, con el overlay que se le pida detrás.
+
+    Con dotnet=True el directorio CLR apunta al inicio de la sección, que es
+    lo único que las reglas miran para saber si un PE es una assembly .NET.
+    """
     file_align = 0x200
     sect_raw = section_data.ljust(
         (len(section_data) + file_align - 1) // file_align * file_align, b"\x00")
@@ -52,7 +58,10 @@ def build_pe(section_data: bytes = b"\x90" * 512,
     opt += struct.pack("<IHH", 0, 3, 0x8140)         # CheckSum, Subsystem=CUI, DllCharacteristics
     opt += struct.pack("<QQQQ", 0x100000, 0x1000, 0x100000, 0x1000)  # stack/heap
     opt += struct.pack("<II", 0, 16)                 # LoaderFlags, NumberOfRvaAndSizes
-    opt += b"\x00" * (16 * 8)                        # los 16 data directories, vacíos
+    dirs = [(0, 0)] * 16                             # los 16 data directories, vacíos
+    if dotnet:
+        dirs[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR] = (0x1000, 72)  # 72 = tamaño de la cabecera CLR
+    opt += b"".join(struct.pack("<II", rva, size) for rva, size in dirs)
     assert len(opt) == opt_header_size, len(opt)
 
     section = struct.pack("<8sIIIIIIHHI",

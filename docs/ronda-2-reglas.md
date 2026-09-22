@@ -143,6 +143,10 @@ en el corpus, así que hoy es una hipótesis sin medir, no un hecho.
 
 ## Hipótesis 3, BLOQUEADA: no hay goodware .NET con el que falsarla
 
+> **Actualización (23 de septiembre):** desbloqueada en la
+> [ronda 3](ronda-3-dotnet.md), que confirma que una regla de "recurso
+> grande y de alta entropía" marcaría apps .NET legítimas.
+
 Trece muestras del corpus son .NET (10 njrat, MassLogger, Formbook, RemcosRAT),
 doce de ellas con un único import: `mscoree.dll!_CorExeMain`. Cinco njrat siguen
 sin detectarse.

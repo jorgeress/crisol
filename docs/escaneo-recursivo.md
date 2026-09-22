@@ -2,6 +2,10 @@
 
 _7 de septiembre de 2026 · 69 muestras de malware · 58 de goodware_
 
+> **Actualización (23 de septiembre):** el goodware .NET que pedía este
+> documento ya existe, y confirmó la sospecha: las +6 eran falsos positivos de
+> `high_entropy_section`. Ver [ronda 3](ronda-3-dotnet.md).
+
 `overlay_bulk_inflation` renuncia a propósito a los instaladores: un NSIS
 malicioso y uno legítimo tienen la misma forma, y separarlos exige mirar
 dentro. Esto es mirar dentro. **Y el resultado principal no es la detección que

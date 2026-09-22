@@ -41,6 +41,14 @@ def test_anti_debug_does_not_fire_on_single_weak():
     assert "anti_debug_stacked" not in _rules_hit(buf)
 
 
+def test_anti_debug_does_not_fire_on_a_debugger():
+    # las APIs de mscordbi.dll, el depurador de .NET: engancharse a un proceso
+    # (DebugActiveProcess) es lo que hace un depurador, no una evasión. Ronda 4.
+    buf = b"MZ" + b"\x00" * 64
+    buf += b"DebugActiveProcess\x00IsDebuggerPresent\x00GetThreadContext\x00"
+    assert "anti_debug_stacked" not in _rules_hit(buf)
+
+
 def test_vba_downloader_fires_on_maldoc_pattern():
     doc = (b"\xd0\xcf\x11\xe0"  # cabecera OLE (no PE)
            b"...AutoOpen...MSXML2.XMLHTTP...CreateObject...Shell...")
@@ -95,6 +103,18 @@ def test_overlay_does_not_fire_below_thresholds():
     # overlay minoritario dentro de un fichero grande: 6 MB sobre 26 MB
     big = build_pe(section_data=os.urandom(20 * MB), overlay=os.urandom(6 * MB))
     assert "overlay_bulk_inflation" not in _rules_hit(big)
+
+
+def test_high_entropy_section_fires_on_native_pe():
+    # sección ejecutable cifrada en un PE nativo: el caso del empaquetador
+    assert "high_entropy_section" in _rules_hit(build_pe(section_data=os.urandom(64 * 1024)))
+
+
+def test_high_entropy_section_ignores_dotnet_assembly():
+    # los mismos bytes en una assembly .NET son recursos gestionados dentro de
+    # .text (imágenes, datos comprimidos), no código cifrado. Ver ronda 3.
+    pe = build_pe(section_data=os.urandom(64 * 1024), dotnet=True)
+    assert "high_entropy_section" not in _rules_hit(pe)
 
 
 def test_clean_minimal_pe_is_not_flagged():
