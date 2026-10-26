@@ -1,5 +1,7 @@
 # Segunda ronda: qué sobrevive al banco
 
+*[English version](en/round-2-rules.md)*
+
 _7 de septiembre de 2026 · 69 muestras de malware · 57 de goodware_
 
 La [primera medición](hallazgos-deteccion.md) dejó tres hipótesis con su

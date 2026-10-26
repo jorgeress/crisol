@@ -1,5 +1,7 @@
 # Tercera ronda: goodware .NET, y una regla que no detectaba lo que parecía
 
+*[English version](en/round-3-dotnet.md)*
+
 _23 de septiembre de 2026 · 69 muestras de malware · 64 de goodware_
 
 Las dos rondas anteriores dejaron el mismo bloqueo apuntado dos veces: en el

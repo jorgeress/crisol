@@ -1,5 +1,7 @@
 # Abrir el contenedor: escaneo recursivo
 
+*[English version](en/recursive-scanning.md)*
+
 _7 de septiembre de 2026 · 69 muestras de malware · 58 de goodware_
 
 > **Actualización (23 de septiembre):** el goodware .NET que pedía este
@@ -73,7 +75,7 @@ multiplica el alcance a las reglas que ya tienes, puntos ciegos incluidos.**
 Para medirlo haría falta goodware .NET. En esta máquina hay **cero** assemblies
 .NET (rebuscado en `/usr/lib/wine`, `/opt`, `/usr/lib/mono`, `/usr/share/dotnet`)
 y no hay toolchain `dotnet` con el que generarlas. Es la misma pared que
-bloqueó la [hipótesis 3 de la ronda 2](ronda-2-reglas.md#hipótesis-3--bloqueada-no-hay-goodware-net-con-el-que-falsarla),
+bloqueó la [hipótesis 3 de la ronda 2](ronda-2-reglas.md#hipótesis-3-bloqueada-no-hay-goodware-net-con-el-que-falsarla),
 y ahora bloquea dos cosas en vez de una.
 
 Por eso el 37.68% no sube al README como tasa de detección, y `--recursive` es

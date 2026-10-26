@@ -37,52 +37,52 @@ def _cmd_scan(args) -> int:
 
     if args.html:
         Path(args.html).write_text(to_html(report), encoding="utf-8")
-        console.print(f"[green]informe HTML escrito en[/] {args.html}")
+        console.print(f"[green]HTML report written to[/] {args.html}")
 
     t = report["triage"]
     color = {"malicious-likely": "red", "suspicious": "yellow",
              "clean-likely": "green"}[t["verdict"]]
     console.print(f"\n[bold]{feats.path}[/]")
     console.print(f"  sha256   {feats.sha256}")
-    console.print(f"  tipo     {feats.filetype}  ·  {feats.size} bytes  ·  "
-                  f"entropía {feats.entropy}")
-    console.print(f"  veredicto [{color}]{t['verdict']}[/]  (score {t['score']}/100)")
+    console.print(f"  type     {feats.filetype}  ·  {feats.size} bytes  ·  "
+                  f"entropy {feats.entropy}")
+    console.print(f"  verdict  [{color}]{t['verdict']}[/]  (score {t['score']}/100)")
 
     if feats.pe:
-        console.print(f"  PE: {feats.pe['n_sections']} secciones, "
+        console.print(f"  PE: {feats.pe['n_sections']} sections, "
                       f"{feats.pe['n_imports']} imports, "
                       f"imphash {feats.pe['imphash']}")
         if feats.pe["suspicious_imports"]:
-            console.print(f"      imports sospechosos: "
+            console.print(f"      suspicious imports: "
                           f"[yellow]{', '.join(feats.pe['suspicious_imports'])}[/]")
     if feats.ole:
         console.print(f"  OLE/VBA: macros={feats.ole['has_macros']} "
                       f"autoexec={feats.ole['autoexec_triggers']}")
 
     if matches:
-        tbl = Table(title="Coincidencias YARA", show_lines=False)
-        tbl.add_column("regla", style="cyan")
+        tbl = Table(title="YARA matches", show_lines=False)
+        tbl.add_column("rule", style="cyan")
         tbl.add_column("sev")
         tbl.add_column("tags")
-        tbl.add_column("descripción")
+        tbl.add_column("description")
         for m in matches:
             tbl.add_row(m.rule, str(m.meta.get("severity", "?")),
                         ", ".join(m.tags), str(m.meta.get("description", "")))
         console.print(tbl)
     else:
-        console.print("  [dim]sin coincidencias YARA[/]")
+        console.print("  [dim]no YARA matches[/]")
 
     if nested:
-        tbl = Table(title="Payloads embebidos que sí disparan", show_lines=False)
-        tbl.add_column("origen", style="magenta")
-        tbl.add_column("reglas")
+        tbl = Table(title="Embedded payloads that do match", show_lines=False)
+        tbl.add_column("origin", style="magenta")
+        tbl.add_column("rules")
         for origin, hits in nested:
             tbl.add_row(origin, ", ".join(sorted({m.rule for m in hits})))
         console.print(tbl)
-        console.print("  [dim]no cuentan para el veredicto: el contenedor no es "
-                      "su contenido[/]")
+        console.print("  [dim]these don't count towards the verdict: a container is not "
+                      "its contents[/]")
     elif args.recursive:
-        console.print("  [dim]sin coincidencias en los payloads embebidos[/]")
+        console.print("  [dim]no matches in embedded payloads[/]")
 
     for ioc_type, vals in feats.iocs.items():
         if vals:
@@ -104,8 +104,8 @@ def _cmd_features(args) -> int:
 
 def _cmd_rules(args) -> int:
     rs = RuleSet(args.rules).compile()
-    console.print(f"[green]{rs.rule_count} reglas compiladas OK[/] "
-                  f"desde {args.rules}")
+    console.print(f"[green]{rs.rule_count} rules compiled OK[/] "
+                  f"from {args.rules}")
     for src in rs.sources:
         console.print(f"  · {src}")
     return 0
@@ -114,26 +114,26 @@ def _cmd_rules(args) -> int:
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(
         prog="crisol",
-        description="Motor de triaje estático de malware + banco de reglas YARA")
+        description="Static malware triage engine + YARA rule test bench")
     p.add_argument("--version", action="version", version=f"crisol {__version__}")
     sub = p.add_subparsers(dest="cmd", required=True)
 
-    ps = sub.add_parser("scan", help="triaje completo de una muestra")
+    ps = sub.add_parser("scan", help="full triage of a sample")
     ps.add_argument("sample")
     ps.add_argument("--rules", default=str(DEFAULT_RULES))
-    ps.add_argument("--json", action="store_true", help="salida JSON")
-    ps.add_argument("--html", metavar="OUT.html", help="escribe informe HTML")
+    ps.add_argument("--json", action="store_true", help="JSON output")
+    ps.add_argument("--html", metavar="OUT.html", help="write an HTML report")
     ps.add_argument("--timeout", type=int, default=30)
     ps.add_argument("--recursive", action="store_true",
-                    help="escanea también los PE embebidos y los miembros de ZIP "
-                         "que lleve dentro (no alteran el veredicto)")
+                    help="also scan embedded PEs and ZIP members inside the sample "
+                         "(they don't change the verdict)")
     ps.set_defaults(func=_cmd_scan)
 
-    pf = sub.add_parser("features", help="solo extracción de features (JSON)")
+    pf = sub.add_parser("features", help="feature extraction only (JSON)")
     pf.add_argument("sample")
     pf.set_defaults(func=_cmd_features)
 
-    pr = sub.add_parser("rules", help="compila y valida el ruleset")
+    pr = sub.add_parser("rules", help="compile and validate the ruleset")
     pr.add_argument("--rules", default=str(DEFAULT_RULES))
     pr.set_defaults(func=_cmd_rules)
 

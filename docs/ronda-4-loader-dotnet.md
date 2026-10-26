@@ -1,5 +1,7 @@
 # Cuarta ronda: el crypter de las cuatro familias
 
+*[English version](en/round-4-dotnet-loader.md)*
+
 _23 de septiembre de 2026 · 69 muestras de malware · 315 de goodware_
 
 La [ronda 3](ronda-3-dotnet.md) dejó ciegas a 8 muestras .NET: `high_entropy_section`

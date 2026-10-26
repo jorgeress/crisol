@@ -1,5 +1,7 @@
 # Primera medición de detección sobre malware real
 
+*[English version](en/round-1-detection.md)*
+
 _3 de septiembre de 2026 · 19 muestras · 12 familias_
 
 Hasta aquí crisol solo medía **falsos positivos** (0% sobre 52 binarios

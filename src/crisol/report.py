@@ -82,14 +82,14 @@ th,td{{border:1px solid #ddd;padding:6px 10px;text-align:left;font-size:13px}}
 th{{background:#fafafa}} .meter{{height:22px;background:#eee;border-radius:11px;overflow:hidden}}
 .meter>div{{height:100%;background:linear-gradient(90deg,#27ae60,#e67e22,#c0392b)}}
 </style>
-<h1>crisol · triaje estático</h1>
-<p><code>{path}</code><br>sha256 <code>{sha}</code> · {size} bytes · tipo <b>{ftype}</b></p>
-<p>Veredicto: <span class="badge {verdict}">{verdict}</span> · score <b>{score}/100</b></p>
+<h1>crisol · static triage</h1>
+<p><code>{path}</code><br>sha256 <code>{sha}</code> · {size} bytes · type <b>{ftype}</b></p>
+<p>Verdict: <span class="badge {verdict}">{verdict}</span> · score <b>{score}/100</b></p>
 <div class="meter"><div style="width:{score}%"></div></div>
-<h2>Señales</h2><table><tr><th>señal</th><th>peso</th></tr>{reasons}</table>
-<h2>Coincidencias YARA ({n_yara})</h2><table><tr><th>regla</th><th>severidad</th><th>tags</th></tr>{yara}</table>
+<h2>Signals</h2><table><tr><th>signal</th><th>weight</th></tr>{reasons}</table>
+<h2>YARA matches ({n_yara})</h2><table><tr><th>rule</th><th>severity</th><th>tags</th></tr>{yara}</table>
 <h2>IOCs</h2><pre>{iocs}</pre>
-<hr><p style=color:#888>generado {gen}</p>
+<hr><p style=color:#888>generated {gen}</p>
 """
 
 
@@ -98,11 +98,11 @@ def to_html(report: dict[str, Any]) -> str:
     t = report["triage"]
     reasons = "".join(
         f"<tr><td>{r['signal']}</td><td>{r['weight']}</td></tr>" for r in t["reasons"]
-    ) or "<tr><td colspan=2>ninguna</td></tr>"
+    ) or "<tr><td colspan=2>none</td></tr>"
     yara = "".join(
         f"<tr><td>{m['rule']}</td><td>{m['meta'].get('severity','?')}</td>"
         f"<td>{', '.join(m['tags'])}</td></tr>" for m in report["yara_matches"]
-    ) or "<tr><td colspan=3>ninguna</td></tr>"
+    ) or "<tr><td colspan=3>none</td></tr>"
     return _HTML.format(
         path=f["path"], sha=f["sha256"], size=f["size"], ftype=f["filetype"],
         verdict=t["verdict"], score=t["score"], reasons=reasons,

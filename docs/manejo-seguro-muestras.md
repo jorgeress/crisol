@@ -1,5 +1,7 @@
 # Manejo seguro de muestras
 
+*[English version](en/safe-sample-handling.md)*
+
 Este documento explica **cómo se manejan las muestras reales de malware** en
 crisol y, sobre todo, *por qué* cada control está donde está. Es la parte
 que un laboratorio de verdad da por supuesta y que casi ningún proyecto de
